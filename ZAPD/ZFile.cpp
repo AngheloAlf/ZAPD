@@ -13,6 +13,7 @@
 #include "ZCutscene.h"
 #include "ZDisplayList.h"
 #include "ZLimb.h"
+#include "ZMessage.h"
 #include "ZRoom/ZRoom.h"
 #include "ZScalar.h"
 #include "ZSkeleton.h"
@@ -402,6 +403,22 @@ void ZFile::ParseXML(ZFileMode mode, XMLElement* reader, std::string filename, b
 				resources.push_back(array);
 				rawDataIndex += array->GetRawDataSize();
 			}
+		}
+		else if (string(child->Name()) == "Message")
+		{
+			ZMessage* msg = nullptr;
+
+			if (mode == ZFileMode::Extract)
+			{
+				msg = ZMessage::ExtractFromXML(child, rawData, rawDataIndex, folderName, this);
+			}
+
+			if (msg == nullptr)
+			{
+				throw std::runtime_error("Couldn't create ZMessage.");
+			}
+			resources.push_back(msg);
+			rawDataIndex += msg->GetRawDataSize();
 		}
 		else
 		{
