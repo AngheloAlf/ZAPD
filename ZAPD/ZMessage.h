@@ -9,8 +9,8 @@
 
 enum class ZMessageEncoding
 {
-	Ascii,
-	Jap,
+	Ascii, // TODO: think in a proper name
+	Jpn,
 	//Chinese,
 };
 
@@ -48,4 +48,5 @@ public:
 	ZResourceType GetResourceType() override;
 
 	size_t GetMessageLength();
+	std::string GetCharacterAt(size_t index, size_t& charSize);
 };
