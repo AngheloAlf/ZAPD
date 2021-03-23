@@ -324,6 +324,8 @@ std::string ZMessage::GetAsciiMacro(size_t index, size_t& charSize)
     uint8_t code = u8Chars.at(index);
     switch (code)
     {
+    // CODES
+
     case 0x01:
         return "MSGCODE_LINEBREAK";
     case 0x02:
@@ -394,6 +396,34 @@ std::string ZMessage::GetAsciiMacro(size_t index, size_t& charSize)
         return StringHelper::Sprintf("MSGCODE_HIGHSCORE(\"\\x%02X\")", u8Chars.at(index + 1));
     case 0x1F:
         return "MSGCODE_TIME";
+
+    // Special characters
+    case 0x9F:
+        return "MSGCODE_A_BTN";
+    case 0xA0:
+        return "MSGCODE_B_BTN";
+    case 0xA1:
+        return "MSGCODE_C_BTN";
+    case 0xA2:
+        return "MSGCODE_L_BTN";
+    case 0xA3:
+        return "MSGCODE_R_BTN";
+    case 0xA4:
+        return "MSGCODE_Z_BTN";
+    case 0xA5:
+        return "MSGCODE_CUP_BTN";
+    case 0xA6:
+        return "MSGCODE_CDOWN_BTN";
+    case 0xA7:
+        return "MSGCODE_CLEFT_BTN";
+    case 0xA8:
+        return "MSGCODE_CRIGHT_BTN";
+    case 0xA9:
+        return "MSGCODE_TARGET_ICON";
+    case 0xAA:
+        return "MSGCODE_STICK";
+    case 0xAB:
+        return "MSGCODE_DPAD";
     }
 
     charSize = 0;
