@@ -194,7 +194,15 @@ std::string ZMessage::GetSourceOutputCode(const std::string& prefix)
         {
             if (lastWasMacro)
             {
-                bodyStr += "\n    \"";
+                if (i != 0)
+                {
+                    bodyStr += "\n    \"";
+                }
+                else
+                {
+                    bodyStr += "\"";
+                }
+                
                 lastWasMacro = false;
             }
             bodyStr += GetCharacterAt(i, charSize);
@@ -255,19 +263,16 @@ std::string ZMessage::GetCharacterAt(size_t index, size_t& charSize)
 
     if (encoding == ZMessageEncoding::Ascii)
     {
-        result = GetAsciiMacro(index, charSize); // TODO: delete
-        if (charSize != 0) 
-        {
-            return StringHelper::Sprintf("\" %s \n    \"", result.c_str());
-        }
-
         charSize = 1;
-        result = "";
         uint8_t code = u8Chars.at(index);
 
         if (code == 0)
         {
             result += "\\0";
+        }
+        else if (code == '\"')
+        {
+            result += "\\\"";
         }
         else
         {
@@ -279,14 +284,7 @@ std::string ZMessage::GetCharacterAt(size_t index, size_t& charSize)
 
     if (encoding == ZMessageEncoding::Jpn)
     {
-        result = GetJpnMacro(index, charSize);
-        if (charSize != 0) 
-        {
-            return StringHelper::Sprintf("\" %s \n    \"", result.c_str());
-        }
-
         charSize = 1;
-        result = "";
 
         if (u16Chars.at(index) == 0)
         {
