@@ -284,13 +284,20 @@ std::string ZMessage::GetCharacterAt(size_t index, size_t& charSize)
 
     if (encoding == ZMessageEncoding::Jpn)
     {
+        uint16_t code = u16Chars.at(index);
         charSize = 1;
 
-        if (u16Chars.at(index) == 0)
+        if (code == 0x0000)
         {
             result += "\\0";
             result += "\\0";
         }
+        /*else if (code == 0x835C)
+        {
+            // For some reason, the compiler will not omit the 0x53 part of this character.
+            // So now it is a special
+            result += "\\x83\\x5C"; // ソ
+        }*/
         else
         {
             result += u8Chars.at(2 * index);
@@ -398,6 +405,9 @@ std::string ZMessage::GetAsciiMacro(size_t index, size_t& charSize)
         return "MSGCODE_TIME";
 
     // Special characters
+    case 0x96:
+        return "MSGCODE_E_ACUTE_LOWERCASE";
+
     case 0x9F:
         return "MSGCODE_A_BTN";
     case 0xA0:
