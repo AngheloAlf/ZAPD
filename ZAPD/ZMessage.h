@@ -53,4 +53,6 @@ public:
 
 	std::string GetAsciiMacro(size_t index, size_t& charSize);
 	std::string GetJpnMacro(size_t index, size_t& charSize);
+
+	static const char* GetColorMacro(uint16_t code);
 };

@@ -208,7 +208,7 @@ std::string ZMessage::GetAsciiMacro(size_t index, size_t& charSize)
         return "MSGCODE_BOXBREAK";
     case 0x05:
         charSize = 2;
-        return StringHelper::Sprintf("MSGCODE_TEXTCOLOR(\"\\x%02X\")", u8Chars.at(index + 1));
+        return StringHelper::Sprintf("MSGCODE_TEXTCOLOR(%s)", GetColorMacro(u8Chars.at(index + 1)));
     case 0x06:
         charSize = 2;
         return StringHelper::Sprintf("MSGCODE_INDENT(\"\\x%02X\")", u8Chars.at(index + 1));
@@ -296,7 +296,7 @@ std::string ZMessage::GetJpnMacro(size_t index, size_t& charSize)
         return "MSGCODE_BOXBREAK";
     case 0x000B:
         charSize = 2;
-        return StringHelper::Sprintf("MSGCODE_TEXTCOLOR(\"\\x%02X\")", u16Chars.at(index + 1) & 0x0F);
+        return StringHelper::Sprintf("MSGCODE_TEXTCOLOR(%s)", GetColorMacro(u16Chars.at(index + 1)));
     case 0x86C7:
         charSize = 2;
         return StringHelper::Sprintf("MSGCODE_INDENT(\"\\x%02X\")", u16Chars.at(index + 1));
@@ -397,4 +397,29 @@ std::string ZMessage::GetJpnMacro(size_t index, size_t& charSize)
 
     charSize = 0;
     return "";
+}
+
+const char* ZMessage::GetColorMacro(uint16_t code)
+{
+    switch (code & 0x07)
+    {
+    case 0:
+        return "DEFAULT";
+    case 1:
+        return "RED";
+    case 2:
+        return "GREEN";
+    case 3:
+        return "BLUE";
+    case 4:
+        return "LIGHTBLUE";
+    case 5:
+        return "PINK";
+    case 6:
+        return "YELLOW";
+    case 7:
+        return "WHITE";
+    }
+
+    return "ERROR";
 }
