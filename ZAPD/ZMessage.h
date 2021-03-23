@@ -11,7 +11,8 @@ enum class ZMessageEncoding
 {
 	Ascii, // TODO: think in a proper name
 	Jpn,
-	//Chinese,
+	//Cn,
+	//Tw,
 };
 
 class ZMessage : public ZResource
@@ -49,4 +50,7 @@ public:
 
 	size_t GetMessageLength();
 	std::string GetCharacterAt(size_t index, size_t& charSize);
+
+	std::string GetAsciiMacro(size_t index, size_t& charSize);
+	std::string GetJpnMacro(size_t index, size_t& charSize);
 };
