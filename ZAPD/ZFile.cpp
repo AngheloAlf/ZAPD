@@ -418,7 +418,7 @@ void ZFile::ParseXML(ZFileMode mode, XMLElement* reader, std::string filename, b
 				throw std::runtime_error("Couldn't create ZMessage.");
 			}
 			resources.push_back(msg);
-			rawDataIndex += msg->GetRawDataSize();
+			rawDataIndex += msg->GetRawDataSizeWithPadding();
 		}
 		else
 		{

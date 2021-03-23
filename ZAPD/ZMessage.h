@@ -21,12 +21,8 @@ protected:
 	ZMessageEncoding encoding = ZMessageEncoding::Ascii;
 	std::vector<uint8_t> u8Chars; // Ascii
 	std::vector<uint16_t> u16Chars; // Jap
-	/*ZSkeletonType type = ZSkeletonType::Normal;
-	ZLimbType limbType = ZLimbType::Standard;
-	std::vector<ZLimb*> limbs;
-	segptr_t limbsArrayAddress;
-	uint8_t limbCount;
-	uint8_t dListCount;  // FLEX SKELETON ONLY*/
+	
+	size_t padding = 0;
 
 public:
 	ZMessage() = default;
@@ -43,6 +39,7 @@ public:
 	//void Save(const std::string& outFolder) override;
 
 	int GetRawDataSize() override;
+	size_t GetRawDataSizeWithPadding();
 	std::string GetSourceOutputCode(const std::string& prefix) override;
 
 	std::string GetSourceTypeName() override;
@@ -57,7 +54,9 @@ public:
 	std::string GetJpnMacro(size_t index, size_t& charSize);
 
 	static const char* GetColorMacro(uint16_t code);
+	static size_t GetBytesPerCode(uint16_t code, ZMessageEncoding encoding);
 
 	bool IsLineBreak(size_t index);
 	bool IsEndMarker(size_t index);
+
 };

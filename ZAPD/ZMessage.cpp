@@ -62,7 +62,8 @@ void ZMessage::ParseRawData()
 {
 	ZResource::ParseRawData();
 
-    for (size_t i = 0; ; i+=2) {
+    size_t i = 0;
+    while (true) {
         uint8_t c = rawData.at(rawDataIndex + i);
         uint8_t c2 = rawData.at(rawDataIndex + i + 1);
         uint16_t wide = BitConverter::ToUInt16BE(rawData, rawDataIndex + i);
@@ -70,6 +71,8 @@ void ZMessage::ParseRawData()
         if (encoding == ZMessageEncoding::Ascii && c == 0x02) { // End Marker
             break;
         }
+        i += 1;
+
         u16Chars.push_back(wide);
         u8Chars.push_back(c2);
         if (encoding == ZMessageEncoding::Jpn && wide == 0x8170) { // End Marker
@@ -78,7 +81,35 @@ void ZMessage::ParseRawData()
         if (encoding == ZMessageEncoding::Ascii && c2 == 0x02) { // End Marker
             break;
         }
+
+        i += 1;
     }
+
+    if (encoding == ZMessageEncoding::Ascii) {
+        while ((rawDataIndex + i+1) % 4 != 0) {
+            uint8_t code = rawData.at(rawDataIndex + i + 1);
+
+            if (code != 0x00)
+            {
+                break;
+            }
+            padding += 1;
+            i += 1;
+        }
+    }
+    if (encoding == ZMessageEncoding::Jpn) {
+        while ((rawDataIndex + i+2) % 4 != 0) {
+            uint16_t code = BitConverter::ToUInt16BE(rawData, rawDataIndex + i + 2);
+
+            if (code != 0x0000)
+            {
+                break;
+            }
+            padding += 2;
+            i += 2;
+        }
+    }
+    
 }
 
 ZMessage* ZMessage::ExtractFromXML(tinyxml2::XMLElement* reader,
@@ -88,9 +119,15 @@ ZMessage* ZMessage::ExtractFromXML(tinyxml2::XMLElement* reader,
 	ZMessage* message = new ZMessage(reader, nRawData, nRawDataIndex, nParent);
 	message->relativePath = std::move(nRelPath);
 
+
+    std::string auxName = message->GetName();
+    if (auxName == "")
+    {
+        auxName = StringHelper::Sprintf("%sMsg_%06X", "", nRawDataIndex);
+    }
 	message->parent->AddDeclarationArray(message->rawDataIndex, DeclarationAlignment::None,
 	                                 message->GetRawDataSize(), message->GetSourceTypeName(),
-	                                 message->name, message->GetRawDataSize(), "");
+	                                 auxName, message->GetRawDataSize(), "");
 
 	return message;
 }
@@ -98,6 +135,11 @@ ZMessage* ZMessage::ExtractFromXML(tinyxml2::XMLElement* reader,
 int ZMessage::GetRawDataSize()
 {
     return u8Chars.size();
+}
+
+size_t ZMessage::GetRawDataSizeWithPadding()
+{
+    return u8Chars.size() + padding;
 }
 
 std::string ZMessage::GetSourceOutputCode(const std::string& prefix)
@@ -141,8 +183,13 @@ std::string ZMessage::GetSourceOutputCode(const std::string& prefix)
 	Declaration* decl = parent->GetDeclaration(rawDataIndex);
 	if (decl == nullptr)
 	{
+        std::string auxName = name;
+        if (name == "")
+        {
+            auxName = StringHelper::Sprintf("%sMsg_%06X", prefix.c_str(), rawDataIndex);
+        }
 		parent->AddDeclarationArray(rawDataIndex, DeclarationAlignment::None, GetRawDataSize(),
-		                       GetSourceTypeName(), name, GetRawDataSize(), bodyStr);
+		                       GetSourceTypeName(), auxName, GetRawDataSize(), bodyStr);
 	}
 	else
 	{
@@ -189,8 +236,16 @@ std::string ZMessage::GetCharacterAt(size_t index, size_t& charSize)
         charSize = 1;
         result = "";
         uint8_t code = u8Chars.at(index);
+
+        if (code == 0)
+        {
+            result += "\\0";
+        }
+        else
+        {
+            result += code;
+        }
         
-        result += code;
         return result;
     }
 
@@ -205,8 +260,17 @@ std::string ZMessage::GetCharacterAt(size_t index, size_t& charSize)
         charSize = 1;
         result = "";
 
-        result += u8Chars.at(2 * index);
-        result += u8Chars.at(2 * index + 1);
+        if (BitConverter::ToUInt16BE(u8Chars, 2 * index) == 0)
+        {
+            result += "\\0";
+            result += "\\0";
+        }
+        else
+        {
+            result += u8Chars.at(2 * index);
+            result += u8Chars.at(2 * index + 1);
+        }
+
         return result;
     }
 
@@ -456,6 +520,36 @@ const char* ZMessage::GetColorMacro(uint16_t code)
     }
 
     return "ERROR";
+}
+
+size_t ZMessage::GetBytesPerCode(uint16_t code, ZMessageEncoding encoding)
+{
+    switch (encoding)
+    {
+    case ZMessageEncoding::Ascii:
+        switch (code)
+        {
+        case 0x05:
+        case 0x06:
+        case 0x0C:
+        case 0x0E:
+        case 0x13:
+        case 0x14:
+        case 0x1E:
+            return 2;
+        case 0x07:
+        case 0x12:
+            return 3;
+        case 0x15:
+            return 4;
+        default:
+            return 1;
+        }
+    case ZMessageEncoding::Jpn:
+        return 2;
+    }
+
+    return 0;
 }
 
 bool ZMessage::IsLineBreak(size_t index)
