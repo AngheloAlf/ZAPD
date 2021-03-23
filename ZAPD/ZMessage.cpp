@@ -63,29 +63,26 @@ void ZMessage::ParseRawData()
 	ZResource::ParseRawData();
 
     size_t i = 0;
-    while (true) {
-        uint8_t c = rawData.at(rawDataIndex + i);
-        uint8_t c2 = rawData.at(rawDataIndex + i + 1);
-        uint16_t wide = BitConverter::ToUInt16BE(rawData, rawDataIndex + i);
-        u8Chars.push_back(c);
-        if (encoding == ZMessageEncoding::Ascii && c == 0x02) { // End Marker
-            break;
-        }
-        i += 1;
+    if (encoding == ZMessageEncoding::Ascii)
+    {
+        while (true)
+        {
+            uint8_t code = rawData.at(rawDataIndex + i);
 
-        u16Chars.push_back(wide);
-        u8Chars.push_back(c2);
-        if (encoding == ZMessageEncoding::Jpn && wide == 0x8170) { // End Marker
-            break;
-        }
-        if (encoding == ZMessageEncoding::Ascii && c2 == 0x02) { // End Marker
-            break;
+            if (IsCodeEndMarker(code, encoding))
+            {
+                u8Chars.push_back(code);
+                break;
+            }
+
+            size_t bytes = GetBytesPerCode(code, encoding);
+            while (bytes-- > 0)
+            {
+                u8Chars.push_back(rawData.at(rawDataIndex + i));
+                i++;
+            }
         }
 
-        i += 1;
-    }
-
-    if (encoding == ZMessageEncoding::Ascii) {
         while ((rawDataIndex + i+1) % 4 != 0) {
             uint8_t code = rawData.at(rawDataIndex + i + 1);
 
@@ -96,8 +93,33 @@ void ZMessage::ParseRawData()
             padding += 1;
             i += 1;
         }
+
+        for (size_t j = 0; j <  u8Chars.size(); j+=2)
+        {
+            u16Chars.push_back(BitConverter::ToUInt16BE(u8Chars, j));
+        }
     }
-    if (encoding == ZMessageEncoding::Jpn) {
+    else if (encoding == ZMessageEncoding::Jpn)
+    {
+        while (true)
+        {
+            uint16_t code = BitConverter::ToUInt16BE(rawData, rawDataIndex + i);
+
+            if (IsCodeEndMarker(code, encoding))
+            {
+                u16Chars.push_back(code);
+                break;
+            }
+
+            size_t bytes = GetBytesPerCode(code, encoding);
+            while (bytes > 0)
+            {
+                u16Chars.push_back(BitConverter::ToUInt16BE(rawData, rawDataIndex + i));
+                i += 2;
+                bytes -= 2;
+            }
+        }
+
         while ((rawDataIndex + i+2) % 4 != 0) {
             uint16_t code = BitConverter::ToUInt16BE(rawData, rawDataIndex + i + 2);
 
@@ -108,8 +130,14 @@ void ZMessage::ParseRawData()
             padding += 2;
             i += 2;
         }
+
+        for (size_t j = 0; j < u16Chars.size(); j++)
+        {
+            uint16_t code = u16Chars.at(j);
+            u8Chars.push_back((code >> 8) & 0xFF);
+            u8Chars.push_back((code >> 0) & 0xFF);
+        }
     }
-    
 }
 
 ZMessage* ZMessage::ExtractFromXML(tinyxml2::XMLElement* reader,
@@ -260,7 +288,7 @@ std::string ZMessage::GetCharacterAt(size_t index, size_t& charSize)
         charSize = 1;
         result = "";
 
-        if (BitConverter::ToUInt16BE(u8Chars, 2 * index) == 0)
+        if (u16Chars.at(index) == 0)
         {
             result += "\\0";
             result += "\\0";
@@ -570,9 +598,22 @@ bool ZMessage::IsEndMarker(size_t index)
     switch (encoding)
     {
     case ZMessageEncoding::Ascii:
-        return u8Chars.at(index) == 0x02;
+        return IsCodeEndMarker(u8Chars.at(index), encoding);
     case ZMessageEncoding::Jpn:
-        return u16Chars.at(index) == 0x8170;
+        return IsCodeEndMarker(u16Chars.at(index), encoding);
+    default:
+        return false;
+    }
+}
+
+bool ZMessage::IsCodeEndMarker(uint16_t code, ZMessageEncoding encoding)
+{
+    switch (encoding)
+    {
+    case ZMessageEncoding::Ascii:
+        return code == 0x02;
+    case ZMessageEncoding::Jpn:
+        return code == 0x8170;
     default:
         return false;
     }

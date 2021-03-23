@@ -58,5 +58,5 @@ public:
 
 	bool IsLineBreak(size_t index);
 	bool IsEndMarker(size_t index);
-
+	static bool IsCodeEndMarker(uint16_t code, ZMessageEncoding encoding);
 };
