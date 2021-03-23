@@ -102,19 +102,41 @@ int ZMessage::GetRawDataSize()
 
 std::string ZMessage::GetSourceOutputCode(const std::string& prefix)
 {
-	std::string bodyStr = "";
+	std::string bodyStr = "    ";
 
-    bodyStr = "    \"";
-
+    bool lastWasMacro = true;
     size_t i = 0;
     while (i < GetMessageLength())
     {
         size_t charSize = 0;
-        bodyStr += GetCharacterAt(i, charSize);
+        std::string macro = GetMacro(i, charSize);
+
+        if (charSize != 0)
+        {
+            if (!lastWasMacro)
+            {
+                bodyStr += "\" ";
+                lastWasMacro = true;
+            }
+            bodyStr += macro + " ";
+        }
+        else
+        {
+            if (lastWasMacro)
+            {
+                bodyStr += "\n    \"";
+                lastWasMacro = false;
+            }
+            bodyStr += GetCharacterAt(i, charSize);
+            assert(charSize != 0);
+        }
         i += charSize;
     }
 
-    bodyStr += "\"";
+    if (!lastWasMacro)
+    {
+        bodyStr += "\"";
+    }
 
 	Declaration* decl = parent->GetDeclaration(rawDataIndex);
 	if (decl == nullptr)
@@ -132,7 +154,7 @@ std::string ZMessage::GetSourceOutputCode(const std::string& prefix)
 
 std::string ZMessage::GetSourceTypeName()
 {
-    return "char*";
+    return "char";
 }
 
 ZResourceType ZMessage::GetResourceType()
@@ -158,7 +180,7 @@ std::string ZMessage::GetCharacterAt(size_t index, size_t& charSize)
 
     if (encoding == ZMessageEncoding::Ascii)
     {
-        result = GetAsciiMacro(index, charSize);
+        result = GetAsciiMacro(index, charSize); // TODO: delete
         if (charSize != 0) 
         {
             return StringHelper::Sprintf("\" %s \n    \"", result.c_str());
@@ -191,6 +213,18 @@ std::string ZMessage::GetCharacterAt(size_t index, size_t& charSize)
     return "ERROR";
 }
 
+std::string ZMessage::GetMacro(size_t index, size_t& charSize)
+{
+    switch (encoding)
+    {
+    case ZMessageEncoding::Ascii:
+        return GetAsciiMacro(index, charSize);
+    case ZMessageEncoding::Jpn:
+        return GetJpnMacro(index, charSize);
+    default:
+        return "ERROR";
+    }
+}
 
 std::string ZMessage::GetAsciiMacro(size_t index, size_t& charSize)
 {
@@ -248,7 +282,7 @@ std::string ZMessage::GetAsciiMacro(size_t index, size_t& charSize)
         return StringHelper::Sprintf("MSGCODE_TEXTSPEED(\"\\x%02X\")", u8Chars.at(index + 1));
     case 0x15:
         charSize = 4;
-        return StringHelper::Sprintf("MSGCODE_BACKGROUND(\"\\x%02X\", \\x%02X\", \"\\x%02X\")", u8Chars.at(index + 1), u8Chars.at(index + 2), u8Chars.at(index + 3));
+        return StringHelper::Sprintf("MSGCODE_BACKGROUND(\"\\x%02X\", \"\\x%02X\", \"\\x%02X\")", u8Chars.at(index + 1), u8Chars.at(index + 2), u8Chars.at(index + 3));
     case 0x16:
         return "MSGCODE_MARATHONTIME";
     case 0x17:
@@ -422,4 +456,30 @@ const char* ZMessage::GetColorMacro(uint16_t code)
     }
 
     return "ERROR";
+}
+
+bool ZMessage::IsLineBreak(size_t index)
+{
+    switch (encoding)
+    {
+    case ZMessageEncoding::Ascii:
+        return u8Chars.at(index) == 0x01;
+    case ZMessageEncoding::Jpn:
+        return u16Chars.at(index) == 0x000A;
+    default:
+        return false;
+    }
+}
+
+bool ZMessage::IsEndMarker(size_t index)
+{
+    switch (encoding)
+    {
+    case ZMessageEncoding::Ascii:
+        return u8Chars.at(index) == 0x02;
+    case ZMessageEncoding::Jpn:
+        return u16Chars.at(index) == 0x8170;
+    default:
+        return false;
+    }
 }

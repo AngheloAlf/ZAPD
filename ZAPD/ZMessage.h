@@ -51,8 +51,13 @@ public:
 	size_t GetMessageLength();
 	std::string GetCharacterAt(size_t index, size_t& charSize);
 
+	// Convenience method that calls GetAsciiMacro or GetJpnMacro.
+	std::string GetMacro(size_t index, size_t& charSize);
 	std::string GetAsciiMacro(size_t index, size_t& charSize);
 	std::string GetJpnMacro(size_t index, size_t& charSize);
 
 	static const char* GetColorMacro(uint16_t code);
+
+	bool IsLineBreak(size_t index);
+	bool IsEndMarker(size_t index);
 };
