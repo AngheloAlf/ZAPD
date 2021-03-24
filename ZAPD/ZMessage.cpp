@@ -325,11 +325,16 @@ std::string ZMessage::GetCharacterAt(size_t index, size_t& charSize)
         {
             result += "\\\"";
         }*/
-        else if (code = 0xA0)
+        else if (code == 0xA0)
         {
-            charSize = 2;
             result += code;
-            result += u8Chars.at(index + 1);
+
+            uint8_t code2 = u8Chars.at(index + 1);
+            if (code2 >= 0x40 && code2 < 0xFF) 
+            {
+                charSize = 2;
+                result += code2;
+            }
         }
         else
         {
@@ -808,8 +813,10 @@ size_t ZMessage::GetBytesPerCode(uint16_t code, ZMessageEncoding encoding)
         default:
             return 1;
         }
+
     case ZMessageEncoding::Jpn: // TODO
         return 2;
+
     case ZMessageEncoding::Cn: // TODO
         switch (code)
         {
@@ -826,8 +833,8 @@ size_t ZMessage::GetBytesPerCode(uint16_t code, ZMessageEncoding encoding)
             return 3;
         case 0x15:
             return 4;
-        case 0xA0:
-            return 2;
+        //case 0xA0:
+        //    return 2;
         default:
             return 1;
         }
