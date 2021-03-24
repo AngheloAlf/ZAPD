@@ -321,20 +321,20 @@ std::string ZMessage::GetCharacterAt(size_t index, size_t& charSize)
         {
             result += "\\0";
         }
-        /*else if (code == '\"')
+        else if (code == '\"')
         {
             result += "\\\"";
-        }*/
-        else if (code == 0xA0)
+        }
+        else if (code >= 0xA0 && code <= 0xA7)
         {
-            result += code;
-
             uint8_t code2 = u8Chars.at(index + 1);
-            if (code2 >= 0x40 && code2 < 0xFF) 
-            {
-                charSize = 2;
-                result += code2;
-            }
+            charSize = 2;
+
+            // Commented until we figure out what is the encoding used.
+            // result += code;
+            // result += code2;
+
+            result = StringHelper::Sprintf("\\x%02X\\x%02X", code, code2);
         }
         else
         {
@@ -833,8 +833,15 @@ size_t ZMessage::GetBytesPerCode(uint16_t code, ZMessageEncoding encoding)
             return 3;
         case 0x15:
             return 4;
-        //case 0xA0:
-        //    return 2;
+        case 0xA0:
+        case 0xA1:
+        case 0xA2:
+        case 0xA3:
+        case 0xA4:
+        case 0xA5:
+        case 0xA6:
+        case 0xA7:
+            return 2;
         default:
             return 1;
         }
