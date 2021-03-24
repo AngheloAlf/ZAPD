@@ -11,7 +11,7 @@ enum class ZMessageEncoding
 {
 	Ascii, // TODO: think in a proper name
 	Jpn,
-	//Cn,
+	Cn,
 	//Tw,
 };
 
@@ -52,7 +52,9 @@ public:
 	std::string GetMacro(size_t index, size_t& charSize);
 	std::string GetAsciiMacro(size_t index, size_t& charSize);
 	std::string GetJpnMacro(size_t index, size_t& charSize);
+	std::string GetCnMacro(size_t index, size_t& charSize);
 
+	static const char* GetSpecialCharacterMacro(uint8_t code);
 	static const char* GetColorMacro(uint16_t code);
 	static size_t GetBytesPerCode(uint16_t code, ZMessageEncoding encoding);
 

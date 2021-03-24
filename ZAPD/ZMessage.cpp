@@ -47,6 +47,10 @@ void ZMessage::ParseXML(tinyxml2::XMLElement* reader)
 		{
 			encoding = ZMessageEncoding::Jpn;
 		}
+		else if (encodingStr == "Cn")
+		{
+			encoding = ZMessageEncoding::Cn;
+		}
 		else
 		{
 			fprintf(stderr,
@@ -63,7 +67,7 @@ void ZMessage::ParseRawData()
 	ZResource::ParseRawData();
 
     size_t i = 0;
-    if (encoding == ZMessageEncoding::Ascii)
+    if (encoding == ZMessageEncoding::Ascii || encoding == ZMessageEncoding::Cn)
     {
         while (true)
         {
@@ -181,7 +185,7 @@ std::string ZMessage::GetSourceOutputCode(const std::string& prefix)
         size_t charSize = 0;
         std::string macro = GetMacro(i, charSize);
 
-        if (charSize != 0)
+        if (charSize != 0) // It's a macro
         {
             if (!lastWasMacro)
             {
@@ -250,6 +254,7 @@ size_t ZMessage::GetMessageLength()
     switch (encoding)
     {
     case ZMessageEncoding::Ascii:
+    case ZMessageEncoding::Cn:
         return u8Chars.size();
     case ZMessageEncoding::Jpn:
         return u16Chars.size();
@@ -307,6 +312,33 @@ std::string ZMessage::GetCharacterAt(size_t index, size_t& charSize)
         return result;
     }
 
+    if (encoding == ZMessageEncoding::Cn)
+    {
+        charSize = 1;
+        uint8_t code = u8Chars.at(index);
+
+        if (code == 0)
+        {
+            result += "\\0";
+        }
+        /*else if (code == '\"')
+        {
+            result += "\\\"";
+        }*/
+        else if (code = 0xA0)
+        {
+            charSize = 2;
+            result += code;
+            result += u8Chars.at(index + 1);
+        }
+        else
+        {
+            result += code;
+        }
+        
+        return result;
+    }
+
     return "ERROR";
 }
 
@@ -318,6 +350,8 @@ std::string ZMessage::GetMacro(size_t index, size_t& charSize)
         return GetAsciiMacro(index, charSize);
     case ZMessageEncoding::Jpn:
         return GetJpnMacro(index, charSize);
+    case ZMessageEncoding::Cn:
+        return GetCnMacro(index, charSize);
     default:
         return "ERROR";
     }
@@ -563,6 +597,169 @@ std::string ZMessage::GetJpnMacro(size_t index, size_t& charSize)
     return "";
 }
 
+
+std::string ZMessage::GetCnMacro(size_t index, size_t& charSize)
+{
+    assert(encoding == ZMessageEncoding::Cn);
+
+    charSize = 1;
+    uint8_t code = u8Chars.at(index);
+    switch (code)
+    {
+    // CODES
+
+    case 0x01:
+        return "MSGCODE_LINEBREAK";
+    case 0x02:
+        return "MSGCODE_ENDMARKER";
+    case 0x04:
+        return "MSGCODE_BOXBREAK";
+    case 0x05:
+        charSize = 2;
+        return StringHelper::Sprintf("MSGCODE_TEXTCOLOR(%s)", GetColorMacro(u8Chars.at(index + 1)));
+    case 0x06:
+        charSize = 2;
+        return StringHelper::Sprintf("MSGCODE_INDENT(\"\\x%02X\")", u8Chars.at(index + 1));
+    case 0x07:
+        charSize = 3;
+        return StringHelper::Sprintf("MSGCODE_NEXTMSGID(\"\\x%02X\", \"\\x%02X\")", u8Chars.at(index + 1), u8Chars.at(index + 2));
+    case 0x08:
+        return "MSGCODE_INSTANT_ON";
+    case 0x09:
+        return "MSGCODE_INSTANT_OFF";
+    case 0x0A:
+        return "MSGCODE_KEEPOPEN";
+    case 0x0B:
+        return "MSGCODE_UNKEVENT";
+    case 0x0C:
+        charSize = 2;
+        return StringHelper::Sprintf("MSGCODE_DELAY_BOXBREAK(\"\\x%02X\")", u8Chars.at(index + 1));
+    case 0x0D:
+        return "MSGCODE_UNUSED_1"; // (Unused?) Wait for button press, continue in same box or line. 
+    case 0x0E:
+        charSize = 2;
+        return StringHelper::Sprintf("MSGCODE_DELAY_FADEOUT(\"\\x%02X\")", u8Chars.at(index + 1));
+    case 0x0F:
+        return "MSGCODE_PLAYERNAME";
+    case 0x10:
+        return "MSGCODE_BEGINOCARINA";
+    case 0x11:
+        return "MSGCODE_UNUSED_2"; // (Unused?) Fade out and wait; ignore following text. 
+    case 0x12:
+        charSize = 3;
+        return StringHelper::Sprintf("MSGCODE_PLAYSOUND(\"\\x%02X\", \"\\x%02X\")", u8Chars.at(index + 1), u8Chars.at(index + 2));
+    case 0x13:
+        charSize = 2;
+        return StringHelper::Sprintf("MSGCODE_ITEMICON(\"\\x%02X\")", u8Chars.at(index + 1));
+    case 0x14:
+        charSize = 2;
+        return StringHelper::Sprintf("MSGCODE_TEXTSPEED(\"\\x%02X\")", u8Chars.at(index + 1));
+    case 0x15:
+        charSize = 4;
+        return StringHelper::Sprintf("MSGCODE_BACKGROUND(\"\\x%02X\", \"\\x%02X\", \"\\x%02X\")", u8Chars.at(index + 1), u8Chars.at(index + 2), u8Chars.at(index + 3));
+    case 0x16:
+        return "MSGCODE_MARATHONTIME";
+    case 0x17:
+        return "MSGCODE_HORSERACETIME";
+    case 0x18:
+        return "MSGCODE_HORSEBACKARCHERYSCORE";
+    case 0x19:
+        return "MSGCODE_GOLDSKULLTULATOTAL";
+    case 0x1A:
+        return "MSGCODE_NOSKIP";
+    case 0x1B:
+        return "MSGCODE_TWOCHOICE";
+    case 0x1C:
+        return "MSGCODE_THREECHOICE";
+    case 0x1D:
+        return "MSGCODE_FISHSIZE";
+    case 0x1E:
+        charSize = 2;
+        return StringHelper::Sprintf("MSGCODE_HIGHSCORE(\"\\x%02X\")", u8Chars.at(index + 1));
+    case 0x1F:
+        return "MSGCODE_TIME";
+
+    // Special characters
+    case 0xAA:
+        charSize = 2;
+        return GetSpecialCharacterMacro(u8Chars.at(index+1));
+/*
+    case 0x96:
+        return "MSGCODE_E_ACUTE_LOWERCASE";
+
+    case 0x9F:
+        return "MSGCODE_A_BTN";
+    case 0xA0:
+        return "MSGCODE_B_BTN";
+*/
+    //case 0xA1:
+    //    return "MSGCODE_C_BTN";
+/*
+    case 0xA2:
+        return "MSGCODE_L_BTN";
+    case 0xA3:
+        return "MSGCODE_R_BTN";
+    case 0xA4:
+        return "MSGCODE_Z_BTN";
+    case 0xA5:
+        return "MSGCODE_CUP_BTN";
+    case 0xA6:
+        return "MSGCODE_CDOWN_BTN";
+    case 0xA7:
+        return "MSGCODE_CLEFT_BTN";
+    case 0xA8:
+        return "MSGCODE_CRIGHT_BTN";
+    case 0xA9:
+        return "MSGCODE_TARGET_ICON";
+    case 0xAA:
+        return "MSGCODE_STICK";
+    case 0xAB:
+        return "MSGCODE_DPAD";
+*/
+    }
+
+    charSize = 0;
+    return "";
+}
+
+const char* ZMessage::GetSpecialCharacterMacro(uint8_t code)
+{
+    switch (code)
+    {
+    case 0x96:
+        return "MSGCODE_E_ACUTE_LOWERCASE";
+
+    case 0x9F:
+        return "MSGCODE_A_BTN";
+    case 0xA0:
+        return "MSGCODE_B_BTN";
+    case 0xA1:
+        return "MSGCODE_C_BTN";
+    case 0xA2:
+        return "MSGCODE_L_BTN";
+    case 0xA3:
+        return "MSGCODE_R_BTN";
+    case 0xA4:
+        return "MSGCODE_Z_BTN";
+    case 0xA5:
+        return "MSGCODE_CUP_BTN";
+    case 0xA6:
+        return "MSGCODE_CDOWN_BTN";
+    case 0xA7:
+        return "MSGCODE_CLEFT_BTN";
+    case 0xA8:
+        return "MSGCODE_CRIGHT_BTN";
+    case 0xA9:
+        return "MSGCODE_TARGET_ICON";
+    case 0xAA:
+        return "MSGCODE_STICK";
+    case 0xAB:
+        return "MSGCODE_DPAD";
+    }
+
+    return "ERROR";
+}
+
 const char* ZMessage::GetColorMacro(uint16_t code)
 {
     switch (code & 0x07)
@@ -611,8 +808,29 @@ size_t ZMessage::GetBytesPerCode(uint16_t code, ZMessageEncoding encoding)
         default:
             return 1;
         }
-    case ZMessageEncoding::Jpn:
+    case ZMessageEncoding::Jpn: // TODO
         return 2;
+    case ZMessageEncoding::Cn: // TODO
+        switch (code)
+        {
+        case 0x05:
+        case 0x06:
+        case 0x0C:
+        case 0x0E:
+        case 0x13:
+        case 0x14:
+        case 0x1E:
+            return 2;
+        case 0x07:
+        case 0x12:
+            return 3;
+        case 0x15:
+            return 4;
+        case 0xA0:
+            return 2;
+        default:
+            return 1;
+        }
     }
 
     return 0;
@@ -623,6 +841,7 @@ bool ZMessage::IsLineBreak(size_t index)
     switch (encoding)
     {
     case ZMessageEncoding::Ascii:
+    case ZMessageEncoding::Cn:
         return u8Chars.at(index) == 0x01;
     case ZMessageEncoding::Jpn:
         return u16Chars.at(index) == 0x000A;
@@ -636,6 +855,7 @@ bool ZMessage::IsEndMarker(size_t index)
     switch (encoding)
     {
     case ZMessageEncoding::Ascii:
+    case ZMessageEncoding::Cn:
         return IsCodeEndMarker(u8Chars.at(index), encoding);
     case ZMessageEncoding::Jpn:
         return IsCodeEndMarker(u16Chars.at(index), encoding);
@@ -649,6 +869,7 @@ bool ZMessage::IsCodeEndMarker(uint16_t code, ZMessageEncoding encoding)
     switch (encoding)
     {
     case ZMessageEncoding::Ascii:
+    case ZMessageEncoding::Cn:
         return code == 0x02;
     case ZMessageEncoding::Jpn:
         return code == 0x8170;
