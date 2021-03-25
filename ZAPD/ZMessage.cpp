@@ -413,6 +413,7 @@ std::string ZMessage::GetJpnMacro(size_t index, size_t& codeSize)
     if (macroData != formatCodeMacrosJpnOoT.end())
     {
         size_t macroParams = macroData->second.second;
+        // Params amount is in bytes, but we want halfs (or 2bytes).
         codeSize += (macroParams+1) / 2;
         return MakeMacroWithArguments(2 * (index + 1), *macroData);
     }
@@ -468,7 +469,7 @@ std::string ZMessage::MakeMacroWithArguments(size_t u8Index, const std::pair<uin
         return macroName;
     }
 
-    u8Index += GetMacroArgumentsPadding(code);
+    u8Index += GetMacroArgumentsPadding(code, encoding);
 
     std::string result = macroName;
     result += "(";
@@ -492,7 +493,7 @@ std::string ZMessage::MakeMacroWithArguments(size_t u8Index, const std::pair<uin
     return result;
 }
 
-size_t ZMessage::GetMacroArgumentsPadding(uint16_t code)
+size_t ZMessage::GetMacroArgumentsPadding(uint16_t code, ZMessageEncoding encoding)
 {
     if (encoding == ZMessageEncoding::Jpn)
     {
@@ -514,59 +515,35 @@ size_t ZMessage::GetMacroArgumentsPadding(uint16_t code)
 
 size_t ZMessage::GetBytesPerCode(uint16_t code, ZMessageEncoding encoding)
 {
+    size_t macroParams = GetMacroArgumentsPadding(code, encoding);
+
     switch (encoding)
     {
+    case ZMessageEncoding::Cn:
+        if (code >= 0xA0 && code <= 0xA7)
+        {
+            return 2;
+        }
+        // Case fall-through is inteded.
     case ZMessageEncoding::Ascii:
-        switch (code)
         {
-        case 0x05:
-        case 0x06:
-        case 0x0C:
-        case 0x0E:
-        case 0x13:
-        case 0x14:
-        case 0x1E:
-            return 2;
-        case 0x07:
-        case 0x12:
-            return 3;
-        case 0x15:
-            return 4;
-        default:
-            return 1;
+            const auto& macroData = formatCodeMacrosAsciiOoT.find(code);
+            if (macroData != formatCodeMacrosAsciiOoT.end())
+            {
+                macroParams += macroData->second.second;
+            }
         }
+        return 1 + macroParams;
 
-    case ZMessageEncoding::Jpn: // TODO
-        return 2;
-
-    case ZMessageEncoding::Cn: // TODO
-        switch (code)
+    case ZMessageEncoding::Jpn:
         {
-        case 0x05:
-        case 0x06:
-        case 0x0C:
-        case 0x0E:
-        case 0x13:
-        case 0x14:
-        case 0x1E:
-            return 2;
-        case 0x07:
-        case 0x12:
-            return 3;
-        case 0x15:
-            return 4;
-        case 0xA0:
-        case 0xA1:
-        case 0xA2:
-        case 0xA3:
-        case 0xA4:
-        case 0xA5:
-        case 0xA6:
-        case 0xA7:
-            return 2;
-        default:
-            return 1;
+            const auto& macroData = formatCodeMacrosJpnOoT.find(code);
+            if (macroData != formatCodeMacrosJpnOoT.end())
+            {
+                macroParams += macroData->second.second;
+            }
         }
+        return 2 + macroParams;
     }
 
     return 0;

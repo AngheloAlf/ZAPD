@@ -49,14 +49,14 @@ public:
 	size_t GetMessageLength();
 	std::string GetCharacterAt(size_t index, size_t& codeSize);
 
-	// Convenience method that calls GetAsciiMacro or GetJpnMacro.
+	// Convenience method that calls GetAsciiMacro, GetJpnMacro or GetCnMacro.
 	std::string GetMacro(size_t index, size_t& codeSize);
 	std::string GetAsciiMacro(size_t index, size_t& codeSize);
 	std::string GetJpnMacro(size_t index, size_t& codeSize);
 	std::string GetCnMacro(size_t index, size_t& codeSize);
 
 	std::string MakeMacroWithArguments(size_t u8Index, const std::pair<uint16_t, std::pair<const char*, size_t>>& macroData);
-	size_t GetMacroArgumentsPadding(uint16_t code);
+	static size_t GetMacroArgumentsPadding(uint16_t code, ZMessageEncoding encoding);
 
 	static size_t GetBytesPerCode(uint16_t code, ZMessageEncoding encoding);
 
