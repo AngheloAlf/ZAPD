@@ -261,13 +261,13 @@ size_t ZMessage::GetMessageLength()
     return 0;
 }
 
-std::string ZMessage::GetCharacterAt(size_t index, size_t& charSize)
+std::string ZMessage::GetCharacterAt(size_t index, size_t& codeSize)
 {
     std::string result = "";
 
     if (encoding == ZMessageEncoding::Ascii)
     {
-        charSize = 1;
+        codeSize = 1;
         uint8_t code = u8Chars.at(index);
 
         if (code == 0)
@@ -289,7 +289,7 @@ std::string ZMessage::GetCharacterAt(size_t index, size_t& charSize)
     if (encoding == ZMessageEncoding::Jpn)
     {
         uint16_t code = u16Chars.at(index);
-        charSize = 1;
+        codeSize = 1;
 
         if (code == 0x0000)
         {
@@ -313,7 +313,7 @@ std::string ZMessage::GetCharacterAt(size_t index, size_t& charSize)
 
     if (encoding == ZMessageEncoding::Cn)
     {
-        charSize = 1;
+        codeSize = 1;
         uint8_t code = u8Chars.at(index);
 
         if (code == 0)
@@ -326,8 +326,10 @@ std::string ZMessage::GetCharacterAt(size_t index, size_t& charSize)
         }
         else if (code >= 0xA0 && code <= 0xA7)
         {
+            // If `code` is between 0xA0 and 0xA7, then it is a two bytes character
+
             uint8_t code2 = u8Chars.at(index + 1);
-            charSize = 2;
+            codeSize = 2;
 
             // Commented until we figure out what is the encoding used.
             // result += code;
@@ -346,26 +348,26 @@ std::string ZMessage::GetCharacterAt(size_t index, size_t& charSize)
     return "ERROR";
 }
 
-std::string ZMessage::GetMacro(size_t index, size_t& charSize)
+std::string ZMessage::GetMacro(size_t index, size_t& codeSize)
 {
     switch (encoding)
     {
     case ZMessageEncoding::Ascii:
-        return GetAsciiMacro(index, charSize);
+        return GetAsciiMacro(index, codeSize);
     case ZMessageEncoding::Jpn:
-        return GetJpnMacro(index, charSize);
+        return GetJpnMacro(index, codeSize);
     case ZMessageEncoding::Cn:
-        return GetCnMacro(index, charSize);
+        return GetCnMacro(index, codeSize);
     default:
         return "ERROR";
     }
 }
 
-std::string ZMessage::GetAsciiMacro(size_t index, size_t& charSize)
+std::string ZMessage::GetAsciiMacro(size_t index, size_t& codeSize)
 {
     assert(encoding == ZMessageEncoding::Ascii);
 
-    charSize = 1;
+    codeSize = 1;
     uint8_t code = u8Chars.at(index);
 
     // Special characters
@@ -380,24 +382,24 @@ std::string ZMessage::GetAsciiMacro(size_t index, size_t& charSize)
     if (macroData != formatCodeMacrosAsciiOoT.end())
     {
         size_t macroParams = macroData->second.second;
-        charSize += macroParams;
+        codeSize += macroParams;
         return MakeMacroWithArguments(index+1, *macroData);
     }
 
-    charSize = 0;
+    codeSize = 0;
     return "";
 }
 
-std::string ZMessage::GetJpnMacro(size_t index, size_t& charSize)
+std::string ZMessage::GetJpnMacro(size_t index, size_t& codeSize)
 {
     assert(encoding == ZMessageEncoding::Jpn);
 
-    charSize = 1;
+    codeSize = 1;
     uint16_t code = u16Chars.at(index);
-    uint16_t aux1, aux2, aux3;
+    uint16_t upperHalf = ((code >> 8) & 0xFF);
 
     // Special characters
-    if (((code >> 8) & 0xFF) == 0x83)
+    if (upperHalf == 0x83)
     {
         const auto& specialChar = specialCharactersOoT.find(code & 0xFF);
         if (specialChar != specialCharactersOoT.end())
@@ -411,20 +413,19 @@ std::string ZMessage::GetJpnMacro(size_t index, size_t& charSize)
     if (macroData != formatCodeMacrosJpnOoT.end())
     {
         size_t macroParams = macroData->second.second;
-        charSize += (macroParams+1) / 2;
+        codeSize += (macroParams+1) / 2;
         return MakeMacroWithArguments(2 * (index + 1), *macroData);
     }
 
-    charSize = 0;
+    codeSize = 0;
     return "";
 }
 
-
-std::string ZMessage::GetCnMacro(size_t index, size_t& charSize)
+std::string ZMessage::GetCnMacro(size_t index, size_t& codeSize)
 {
     assert(encoding == ZMessageEncoding::Cn);
 
-    charSize = 1;
+    codeSize = 1;
     uint8_t code = u8Chars.at(index);
 
     // Special characters
@@ -438,7 +439,7 @@ std::string ZMessage::GetCnMacro(size_t index, size_t& charSize)
         const auto& specialChar = specialCharactersOoT.find(u8Chars.at(index+1));
         if (specialChar != specialCharactersOoT.end())
         {
-            charSize = 2;
+            codeSize = 2;
             return specialChar->second;
         }
     }
@@ -448,13 +449,14 @@ std::string ZMessage::GetCnMacro(size_t index, size_t& charSize)
     if (macroData != formatCodeMacrosAsciiOoT.end())
     {
         size_t macroParams = macroData->second.second;
-        charSize += macroParams;
+        codeSize += macroParams;
         return MakeMacroWithArguments(index+1, *macroData);
     }
 
-    charSize = 0;
+    codeSize = 0;
     return "";
 }
+
 
 std::string ZMessage::MakeMacroWithArguments(size_t u8Index, const std::pair<uint16_t, std::pair<const char*, size_t>>& macroData)
 {
@@ -479,7 +481,7 @@ std::string ZMessage::MakeMacroWithArguments(size_t u8Index, const std::pair<uin
 
         if (IsCodeTextColor(code, encoding))
         {
-            result += GetColorMacro(u8Chars.at(u8Index + i));
+            result += colorMacrosOoT.at(u8Chars.at(u8Index + i) & 0x07);
         }
         else
         {
@@ -508,69 +510,6 @@ size_t ZMessage::GetMacroArgumentsPadding(uint16_t code)
         }
     }
     return 0;
-}
-
-const char* ZMessage::GetSpecialCharacterMacro(uint8_t code)
-{
-    switch (code)
-    {
-    case 0x96:
-        return "MSGCODE_E_ACUTE_LOWERCASE";
-
-    case 0x9F:
-        return "MSGCODE_A_BTN";
-    case 0xA0:
-        return "MSGCODE_B_BTN";
-    case 0xA1:
-        return "MSGCODE_C_BTN";
-    case 0xA2:
-        return "MSGCODE_L_BTN";
-    case 0xA3:
-        return "MSGCODE_R_BTN";
-    case 0xA4:
-        return "MSGCODE_Z_BTN";
-    case 0xA5:
-        return "MSGCODE_CUP_BTN";
-    case 0xA6:
-        return "MSGCODE_CDOWN_BTN";
-    case 0xA7:
-        return "MSGCODE_CLEFT_BTN";
-    case 0xA8:
-        return "MSGCODE_CRIGHT_BTN";
-    case 0xA9:
-        return "MSGCODE_TARGET_ICON";
-    case 0xAA:
-        return "MSGCODE_STICK";
-    case 0xAB:
-        return "MSGCODE_DPAD";
-    }
-
-    return "ERROR";
-}
-
-const char* ZMessage::GetColorMacro(uint16_t code)
-{
-    switch (code & 0x07)
-    {
-    case 0:
-        return "DEFAULT";
-    case 1:
-        return "RED";
-    case 2:
-        return "GREEN";
-    case 3:
-        return "BLUE";
-    case 4:
-        return "LIGHTBLUE";
-    case 5:
-        return "PINK";
-    case 6:
-        return "YELLOW";
-    case 7:
-        return "WHITE";
-    }
-
-    return "ERROR";
 }
 
 size_t ZMessage::GetBytesPerCode(uint16_t code, ZMessageEncoding encoding)

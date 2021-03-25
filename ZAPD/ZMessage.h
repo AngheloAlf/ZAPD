@@ -47,19 +47,17 @@ public:
 	ZResourceType GetResourceType() override;
 
 	size_t GetMessageLength();
-	std::string GetCharacterAt(size_t index, size_t& charSize);
+	std::string GetCharacterAt(size_t index, size_t& codeSize);
 
 	// Convenience method that calls GetAsciiMacro or GetJpnMacro.
-	std::string GetMacro(size_t index, size_t& charSize);
-	std::string GetAsciiMacro(size_t index, size_t& charSize);
-	std::string GetJpnMacro(size_t index, size_t& charSize);
-	std::string GetCnMacro(size_t index, size_t& charSize);
+	std::string GetMacro(size_t index, size_t& codeSize);
+	std::string GetAsciiMacro(size_t index, size_t& codeSize);
+	std::string GetJpnMacro(size_t index, size_t& codeSize);
+	std::string GetCnMacro(size_t index, size_t& codeSize);
 
 	std::string MakeMacroWithArguments(size_t u8Index, const std::pair<uint16_t, std::pair<const char*, size_t>>& macroData);
 	size_t GetMacroArgumentsPadding(uint16_t code);
 
-	static const char* GetSpecialCharacterMacro(uint8_t code);
-	static const char* GetColorMacro(uint16_t code);
 	static size_t GetBytesPerCode(uint16_t code, ZMessageEncoding encoding);
 
 	bool IsLineBreak(size_t index);
@@ -69,7 +67,7 @@ public:
 	static bool IsCodeTextColor(uint16_t code, ZMessageEncoding encoding);
 
 	inline static const std::map<uint16_t, std::pair<const char*, size_t>> formatCodeMacrosAsciiOoT = {
-		// { code, { "macro name", arguments } },
+		// { code, { "macro name", number of arguments (in bytes) } },
 		// { 0x00, { "MSGCODE_GARBAGE_1", 0 } },
 		{ 0x01, { "MSGCODE_LINEBREAK", 0 } },
 		{ 0x02, { "MSGCODE_ENDMARKER", 0 } },
@@ -105,7 +103,7 @@ public:
 		{ 0x1F, { "MSGCODE_TIME", 0 } },
 	};
 	inline static const std::map<uint16_t, std::pair<const char*, size_t>> formatCodeMacrosJpnOoT = {
-		// { code, { "macro name", arguments } },
+		// { code, { "macro name", number of arguments (in bytes) } },
 		// { 0x????, { "MSGCODE_GARBAGE_1", 0 } },
 		{ 0x000A, { "MSGCODE_LINEBREAK", 0 } },
 		{ 0x8170, { "MSGCODE_ENDMARKER", 0 } },
@@ -142,7 +140,7 @@ public:
 	};
 	inline static const std::map<uint16_t, const char*> specialCharactersOoT = {
 		// { code, "macro name" },
-		{ 0x96, "MSGCODE_E_ACUTE_LOWERCASE" },
+		{ 0x96, "MSGCODE_E_ACUTE_LOWERCASE" }, // "é"
 
 		{ 0x9F, "MSGCODE_A_BTN" },
 		{ 0xA0, "MSGCODE_B_BTN" },
