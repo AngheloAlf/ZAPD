@@ -23,10 +23,22 @@ class ZMessage : public ZResource
 {
 protected:
 	ZMessageEncoding encoding = ZMessageEncoding::Ascii;
-	std::vector<uint8_t> u8Chars; // Ascii
+	std::vector<uint8_t> u8Chars; // Ascii & Cn
 	std::vector<uint16_t> u16Chars; // Jap
 	
 	size_t padding = 0;
+
+	// Convenience method. Calls GetAsciiMacro, GetJpnMacro or GetCnMacro.
+	std::string GetMacro(size_t index, size_t& codeSize);
+
+	std::string GetAsciiMacro(size_t index, size_t& codeSize);
+	std::string GetJpnMacro(size_t index, size_t& codeSize);
+	std::string GetCnMacro(size_t index, size_t& codeSize);
+
+	std::string MakeMacroWithArguments(size_t u8Index, const std::pair<uint16_t, std::pair<const char*, size_t>>& macroData);
+
+	bool IsLineBreak(size_t index);
+	bool IsEndMarker(size_t index);
 
 public:
 	ZMessage() = default;
@@ -34,17 +46,18 @@ public:
 	          ZFile* nParent);
 	ZMessage(ZMessageEncoding nEncoding, const std::string& prefix,
 	          const std::vector<uint8_t>& nRawData, int nRawDataIndex, ZFile* nParent);
-	//~ZMessage();
 	void ParseXML(tinyxml2::XMLElement* reader) override;
 	void ParseRawData() override;
 	static ZMessage* ExtractFromXML(tinyxml2::XMLElement* reader,
 				const std::vector<uint8_t>& nRawData, int nRawDataIndex,
 				std::string nRelPath, ZFile* nParent);
-	//void Save(const std::string& outFolder) override;
 
 	int GetRawDataSize() override;
 	size_t GetRawDataSizeWithPadding();
+
+	std::string GetBodySourceCode();
 	std::string GetSourceOutputCode(const std::string& prefix) override;
+	static std::string GetDefaultName(const std::string& prefix, uint32_t address);
 
 	std::string GetSourceTypeName() override;
 	ZResourceType GetResourceType() override;
@@ -52,19 +65,10 @@ public:
 	size_t GetMessageLength();
 	std::string GetCharacterAt(size_t index, size_t& codeSize);
 
-	// Convenience method that calls GetAsciiMacro, GetJpnMacro or GetCnMacro.
-	std::string GetMacro(size_t index, size_t& codeSize);
-	std::string GetAsciiMacro(size_t index, size_t& codeSize);
-	std::string GetJpnMacro(size_t index, size_t& codeSize);
-	std::string GetCnMacro(size_t index, size_t& codeSize);
-
-	std::string MakeMacroWithArguments(size_t u8Index, const std::pair<uint16_t, std::pair<const char*, size_t>>& macroData);
 	static size_t GetMacroArgumentsPadding(uint16_t code, ZMessageEncoding encoding);
 
-	static size_t GetBytesPerCode(uint16_t code, ZMessageEncoding encoding);
+	static int GetBytesPerCode(uint16_t code, ZMessageEncoding encoding);
 
-	bool IsLineBreak(size_t index);
-	bool IsEndMarker(size_t index);
 	static bool IsCodeLineBreak(uint16_t code, ZMessageEncoding encoding);
 	static bool IsCodeEndMarker(uint16_t code, ZMessageEncoding encoding);
 	static bool IsCodeTextColor(uint16_t code, ZMessageEncoding encoding);

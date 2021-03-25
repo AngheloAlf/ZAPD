@@ -66,80 +66,46 @@ void ZMessage::ParseRawData()
 	ZResource::ParseRawData();
 
     size_t i = 0;
-    if (encoding == ZMessageEncoding::Ascii || encoding == ZMessageEncoding::Cn)
+    while (true)
     {
-        while (true)
+        uint16_t code = rawData.at(rawDataIndex + i);
+        if (encoding == ZMessageEncoding::Jpn)
         {
-            uint8_t code = rawData.at(rawDataIndex + i);
-
-            if (IsCodeEndMarker(code, encoding))
-            {
-                u8Chars.push_back(code);
-                break;
-            }
-
-            size_t bytes = GetBytesPerCode(code, encoding);
-            while (bytes-- > 0)
-            {
-                u8Chars.push_back(rawData.at(rawDataIndex + i));
-                i++;
-            }
+            code = BitConverter::ToUInt16BE(rawData, rawDataIndex + i);
         }
 
-        while ((rawDataIndex + i+1) % 4 != 0) {
-            uint8_t code = rawData.at(rawDataIndex + i + 1);
-
-            if (code != 0x00)
-            {
-                break;
-            }
-            padding += 1;
-            i += 1;
-        }
-
-        for (size_t j = 0; j <  u8Chars.size(); j+=2)
+        i += GetBytesPerCode(code, encoding);
+        if (IsCodeEndMarker(code, encoding))
         {
-            u16Chars.push_back(BitConverter::ToUInt16BE(u8Chars, j));
+            break;
         }
     }
-    else if (encoding == ZMessageEncoding::Jpn)
+
+    const auto& dataPos = rawData.begin() + rawDataIndex;
+    u8Chars.assign(dataPos, dataPos + i);
+
+    // padding
+    while ((rawDataIndex + i) % 4 != 0) {
+        size_t codeSize = 1;
+        uint16_t code = rawData.at(rawDataIndex + i);
+        if (encoding == ZMessageEncoding::Jpn)
+        {
+            codeSize = 2;
+            code = BitConverter::ToUInt16BE(rawData, rawDataIndex + i);
+        }
+
+        if (code != 0)
+        {
+            break;
+        }
+
+        padding += codeSize;
+        i += codeSize;
+    }
+
+    for (size_t j = 0; j <  u8Chars.size(); j+=2)
     {
-        while (true)
-        {
-            uint16_t code = BitConverter::ToUInt16BE(rawData, rawDataIndex + i);
-
-            if (IsCodeEndMarker(code, encoding))
-            {
-                u16Chars.push_back(code);
-                break;
-            }
-
-            size_t bytes = GetBytesPerCode(code, encoding);
-            while (bytes > 0)
-            {
-                u16Chars.push_back(BitConverter::ToUInt16BE(rawData, rawDataIndex + i));
-                i += 2;
-                bytes -= 2;
-            }
-        }
-
-        while ((rawDataIndex + i+2) % 4 != 0) {
-            uint16_t code = BitConverter::ToUInt16BE(rawData, rawDataIndex + i + 2);
-
-            if (code != 0x0000)
-            {
-                break;
-            }
-            padding += 2;
-            i += 2;
-        }
-
-        for (size_t j = 0; j < u16Chars.size(); j++)
-        {
-            uint16_t code = u16Chars.at(j);
-            u8Chars.push_back(SHORT_UPPERHALF(code));
-            u8Chars.push_back(SHORT_LOWERHALF(code));
-        }
+        u16Chars.push_back(BitConverter::ToUInt16BE(u8Chars, j));
     }
 }
 
@@ -150,11 +116,10 @@ ZMessage* ZMessage::ExtractFromXML(tinyxml2::XMLElement* reader,
 	ZMessage* message = new ZMessage(reader, nRawData, nRawDataIndex, nParent);
 	message->relativePath = std::move(nRelPath);
 
-
     std::string auxName = message->GetName();
     if (auxName == "")
     {
-        auxName = StringHelper::Sprintf("%sMsg_%06X", "", nRawDataIndex);
+        auxName = GetDefaultName("", nRawDataIndex);
     }
 	message->parent->AddDeclarationArray(message->rawDataIndex, DeclarationAlignment::None,
 	                                 message->GetRawDataSize(), message->GetSourceTypeName(),
@@ -173,18 +138,18 @@ size_t ZMessage::GetRawDataSizeWithPadding()
     return u8Chars.size() + padding;
 }
 
-std::string ZMessage::GetSourceOutputCode(const std::string& prefix)
+std::string ZMessage::GetBodySourceCode()
 {
 	std::string bodyStr = "    ";
-
     bool lastWasMacro = true;
+
     size_t i = 0;
     while (i < GetMessageLength())
     {
-        size_t charSize = 0;
-        std::string macro = GetMacro(i, charSize);
+        size_t codeSize = 0;
+        std::string macro = GetMacro(i, codeSize);
 
-        if (charSize != 0) // It's a macro
+        if (codeSize != 0) // It's a macro
         {
             if (!lastWasMacro)
             {
@@ -199,19 +164,17 @@ std::string ZMessage::GetSourceOutputCode(const std::string& prefix)
             {
                 if (i != 0)
                 {
-                    bodyStr += "\n    \"";
+                    bodyStr += "\n    ";
                 }
-                else
-                {
-                    bodyStr += "\"";
-                }
-                
+
+                bodyStr += "\"";
                 lastWasMacro = false;
             }
-            bodyStr += GetCharacterAt(i, charSize);
-            assert(charSize != 0);
+            bodyStr += GetCharacterAt(i, codeSize);
+            assert(codeSize != 0);
         }
-        i += charSize;
+
+        i += codeSize;
     }
 
     if (!lastWasMacro)
@@ -219,13 +182,20 @@ std::string ZMessage::GetSourceOutputCode(const std::string& prefix)
         bodyStr += "\"";
     }
 
+    return bodyStr;
+}
+
+std::string ZMessage::GetSourceOutputCode(const std::string& prefix)
+{
+    std::string bodyStr = GetBodySourceCode();
+
 	Declaration* decl = parent->GetDeclaration(rawDataIndex);
 	if (decl == nullptr)
 	{
         std::string auxName = name;
         if (name == "")
         {
-            auxName = StringHelper::Sprintf("%sMsg_%06X", prefix.c_str(), rawDataIndex);
+            auxName = GetDefaultName(prefix, rawDataIndex);
         }
 		parent->AddDeclarationArray(rawDataIndex, DeclarationAlignment::None, GetRawDataSize(),
 		                       GetSourceTypeName(), auxName, GetRawDataSize(), bodyStr);
@@ -236,6 +206,11 @@ std::string ZMessage::GetSourceOutputCode(const std::string& prefix)
 	}
 
     return "";
+}
+
+std::string ZMessage::GetDefaultName(const std::string& prefix, uint32_t address)
+{
+    return StringHelper::Sprintf("%sMsg_%06X", prefix.c_str(), address);
 }
 
 std::string ZMessage::GetSourceTypeName()
@@ -270,7 +245,7 @@ std::string ZMessage::GetCharacterAt(size_t index, size_t& codeSize)
     {
         uint8_t code = u8Chars.at(index);
 
-        if (code == 0)
+        if (code == 0x00)
         {
             result += "\\0";
         }
@@ -491,9 +466,9 @@ size_t ZMessage::GetMacroArgumentsPadding(uint16_t code, ZMessageEncoding encodi
     return 0;
 }
 
-size_t ZMessage::GetBytesPerCode(uint16_t code, ZMessageEncoding encoding)
+int ZMessage::GetBytesPerCode(uint16_t code, ZMessageEncoding encoding)
 {
-    size_t macroParams = GetMacroArgumentsPadding(code, encoding);
+    int macroParams = GetMacroArgumentsPadding(code, encoding);
 
     switch (encoding)
     {
