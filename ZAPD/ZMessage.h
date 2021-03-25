@@ -7,6 +7,9 @@
 #include "ZResource.h"
 #include "ZFile.h"
 
+#define SHORT_UPPERHALF(x)  (((x) >> 8) & 0xFF)
+#define SHORT_LOWERHALF(x)  (((x) >> 0) & 0xFF)
+
 
 enum class ZMessageEncoding
 {

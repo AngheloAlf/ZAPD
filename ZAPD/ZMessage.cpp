@@ -137,8 +137,8 @@ void ZMessage::ParseRawData()
         for (size_t j = 0; j < u16Chars.size(); j++)
         {
             uint16_t code = u16Chars.at(j);
-            u8Chars.push_back((code >> 8) & 0xFF);
-            u8Chars.push_back((code >> 0) & 0xFF);
+            u8Chars.push_back(SHORT_UPPERHALF(code));
+            u8Chars.push_back(SHORT_LOWERHALF(code));
         }
     }
 }
@@ -264,10 +264,10 @@ size_t ZMessage::GetMessageLength()
 std::string ZMessage::GetCharacterAt(size_t index, size_t& codeSize)
 {
     std::string result = "";
+    codeSize = 1;
 
-    if (encoding == ZMessageEncoding::Ascii)
+    if (encoding == ZMessageEncoding::Ascii || encoding == ZMessageEncoding::Cn)
     {
-        codeSize = 1;
         uint8_t code = u8Chars.at(index);
 
         if (code == 0)
@@ -278,53 +278,7 @@ std::string ZMessage::GetCharacterAt(size_t index, size_t& codeSize)
         {
             result += "\\\"";
         }
-        else
-        {
-            result += code;
-        }
-        
-        return result;
-    }
-
-    if (encoding == ZMessageEncoding::Jpn)
-    {
-        uint16_t code = u16Chars.at(index);
-        codeSize = 1;
-
-        if (code == 0x0000)
-        {
-            result += "\\0";
-            result += "\\0";
-        }
-        /*else if (code == 0x835C)
-        {
-            // For some reason, the compiler will not omit the 0x53 part of this character.
-            // So now it is a special
-            result += "\\x83\\x5C"; // ソ
-        }*/
-        else
-        {
-            result += u8Chars.at(2 * index);
-            result += u8Chars.at(2 * index + 1);
-        }
-
-        return result;
-    }
-
-    if (encoding == ZMessageEncoding::Cn)
-    {
-        codeSize = 1;
-        uint8_t code = u8Chars.at(index);
-
-        if (code == 0)
-        {
-            result += "\\0";
-        }
-        else if (code == '\"')
-        {
-            result += "\\\"";
-        }
-        else if (code >= 0xA0 && code <= 0xA7)
+        else if (encoding == ZMessageEncoding::Cn && code >= 0xA0 && code <= 0xA7)
         {
             // If `code` is between 0xA0 and 0xA7, then it is a two bytes character
 
@@ -345,6 +299,30 @@ std::string ZMessage::GetCharacterAt(size_t index, size_t& codeSize)
         return result;
     }
 
+    if (encoding == ZMessageEncoding::Jpn)
+    {
+        uint16_t code = u16Chars.at(index);
+
+        if (code == 0x0000)
+        {
+            result += "\\0\\0";
+        }
+        /*else if (code == 0x835C)
+        {
+            // For some reason, the compiler will not omit the 0x53 part of this character.
+            // So now it is a special case
+            result += "\\x83\\x5C"; // ソ
+        }*/
+        else
+        {
+            result += SHORT_UPPERHALF(code);
+            result += SHORT_LOWERHALF(code);
+        }
+
+        return result;
+    }
+
+    codeSize = 0;
     return "ERROR";
 }
 
@@ -396,12 +374,12 @@ std::string ZMessage::GetJpnMacro(size_t index, size_t& codeSize)
 
     codeSize = 1;
     uint16_t code = u16Chars.at(index);
-    uint16_t upperHalf = ((code >> 8) & 0xFF);
+    uint16_t upperHalf = SHORT_UPPERHALF(code);
 
     // Special characters
     if (upperHalf == 0x83)
     {
-        const auto& specialChar = specialCharactersOoT.find(code & 0xFF);
+        const auto& specialChar = specialCharactersOoT.find(SHORT_LOWERHALF(code));
         if (specialChar != specialCharactersOoT.end())
         {
             return specialChar->second;
