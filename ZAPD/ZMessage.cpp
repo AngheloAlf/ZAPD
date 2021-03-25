@@ -426,86 +426,30 @@ std::string ZMessage::GetCnMacro(size_t index, size_t& charSize)
 
     charSize = 1;
     uint8_t code = u8Chars.at(index);
-    switch (code)
-    {
-    // CODES
-
-    case 0x01:
-        return "MSGCODE_LINEBREAK";
-    case 0x02:
-        return "MSGCODE_ENDMARKER";
-    case 0x04:
-        return "MSGCODE_BOXBREAK";
-    case 0x05:
-        charSize = 2;
-        return StringHelper::Sprintf("MSGCODE_TEXTCOLOR(%s)", GetColorMacro(u8Chars.at(index + 1)));
-    case 0x06:
-        charSize = 2;
-        return StringHelper::Sprintf("MSGCODE_INDENT(\"\\x%02X\")", u8Chars.at(index + 1));
-    case 0x07:
-        charSize = 3;
-        return StringHelper::Sprintf("MSGCODE_NEXTMSGID(\"\\x%02X\", \"\\x%02X\")", u8Chars.at(index + 1), u8Chars.at(index + 2));
-    case 0x08:
-        return "MSGCODE_INSTANT_ON";
-    case 0x09:
-        return "MSGCODE_INSTANT_OFF";
-    case 0x0A:
-        return "MSGCODE_KEEPOPEN";
-    case 0x0B:
-        return "MSGCODE_UNKEVENT";
-    case 0x0C:
-        charSize = 2;
-        return StringHelper::Sprintf("MSGCODE_DELAY_BOXBREAK(\"\\x%02X\")", u8Chars.at(index + 1));
-    case 0x0D:
-        return "MSGCODE_UNUSED_1"; // (Unused?) Wait for button press, continue in same box or line. 
-    case 0x0E:
-        charSize = 2;
-        return StringHelper::Sprintf("MSGCODE_DELAY_FADEOUT(\"\\x%02X\")", u8Chars.at(index + 1));
-    case 0x0F:
-        return "MSGCODE_PLAYERNAME";
-    case 0x10:
-        return "MSGCODE_BEGINOCARINA";
-    case 0x11:
-        return "MSGCODE_UNUSED_2"; // (Unused?) Fade out and wait; ignore following text. 
-    case 0x12:
-        charSize = 3;
-        return StringHelper::Sprintf("MSGCODE_PLAYSOUND(\"\\x%02X\", \"\\x%02X\")", u8Chars.at(index + 1), u8Chars.at(index + 2));
-    case 0x13:
-        charSize = 2;
-        return StringHelper::Sprintf("MSGCODE_ITEMICON(\"\\x%02X\")", u8Chars.at(index + 1));
-    case 0x14:
-        charSize = 2;
-        return StringHelper::Sprintf("MSGCODE_TEXTSPEED(\"\\x%02X\")", u8Chars.at(index + 1));
-    case 0x15:
-        charSize = 4;
-        return StringHelper::Sprintf("MSGCODE_BACKGROUND(\"\\x%02X\", \"\\x%02X\", \"\\x%02X\")", u8Chars.at(index + 1), u8Chars.at(index + 2), u8Chars.at(index + 3));
-    case 0x16:
-        return "MSGCODE_MARATHONTIME";
-    case 0x17:
-        return "MSGCODE_HORSERACETIME";
-    case 0x18:
-        return "MSGCODE_HORSEBACKARCHERYSCORE";
-    case 0x19:
-        return "MSGCODE_GOLDSKULLTULATOTAL";
-    case 0x1A:
-        return "MSGCODE_NOSKIP";
-    case 0x1B:
-        return "MSGCODE_TWOCHOICE";
-    case 0x1C:
-        return "MSGCODE_THREECHOICE";
-    case 0x1D:
-        return "MSGCODE_FISHSIZE";
-    case 0x1E:
-        charSize = 2;
-        return StringHelper::Sprintf("MSGCODE_HIGHSCORE(\"\\x%02X\")", u8Chars.at(index + 1));
-    case 0x1F:
-        return "MSGCODE_TIME";
 
     // Special characters
-    case 0xAA:
-        charSize = 2;
-        return GetSpecialCharacterMacro(u8Chars.at(index+1));
+    /**
+     * A special character in the iQue releases has the format
+     * `0xAASS`, where `SS` are the same special characters used
+     * in non-jp releases.
+     **/
+    if (code == 0xAA)
+    {
+        const auto& specialChar = specialCharactersOoT.find(u8Chars.at(index+1));
+        if (specialChar != specialCharactersOoT.end())
+        {
+            charSize = 2;
+            return specialChar->second;
+        }
+    }
 
+    // Codes
+    const auto& macroData = formatCodeMacrosAsciiOoT.find(code);
+    if (macroData != formatCodeMacrosAsciiOoT.end())
+    {
+        size_t macroParams = macroData->second.second;
+        charSize += macroParams;
+        return MakeMacroWithArguments(index+1, *macroData);
     }
 
     charSize = 0;
