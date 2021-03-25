@@ -396,115 +396,23 @@ std::string ZMessage::GetJpnMacro(size_t index, size_t& charSize)
     uint16_t code = u16Chars.at(index);
     uint16_t aux1, aux2, aux3;
 
-    switch (code)
-    {
-    // CODES
-
-    case 0x000A:
-        return "MSGCODE_LINEBREAK";
-    case 0x8170:
-        return "MSGCODE_ENDMARKER";
-    case 0x81A5:
-        return "MSGCODE_BOXBREAK";
-    case 0x000B:
-        charSize = 2;
-        return StringHelper::Sprintf("MSGCODE_TEXTCOLOR(%s)", GetColorMacro(u16Chars.at(index + 1)));
-    case 0x86C7:
-        charSize = 2;
-        return StringHelper::Sprintf("MSGCODE_INDENT(\"\\x%02X\")", u16Chars.at(index + 1));
-    case 0x81CB:
-        charSize = 2;
-        aux1 = (u16Chars.at(index + 1) >> 8) & 0xFF;
-        aux2 = (u16Chars.at(index + 1) >> 0) & 0xFF;
-        return StringHelper::Sprintf("MSGCODE_NEXTMSGID(\"\\x%02X\", \"\\x%02X\")", aux1, aux2);
-    case 0x8189:
-        return "MSGCODE_INSTANT_ON";
-    case 0x818A:
-        return "MSGCODE_INSTANT_OFF";
-    case 0x86C8:
-        return "MSGCODE_KEEPOPEN";
-    case 0x819F:
-        return "MSGCODE_UNKEVENT";
-    case 0x81A3:
-        charSize = 2;
-        return StringHelper::Sprintf("MSGCODE_DELAY_BOXBREAK(\"\\x%02X\")", u16Chars.at(index + 1));
-    //case 0x????:
-    //    return "MSGCODE_UNUSED_1"; // (Unused?) Wait for button press, continue in same box or line. 
-    case 0x819E:
-        charSize = 2;
-        return StringHelper::Sprintf("MSGCODE_DELAY_FADEOUT(\"\\x%02X\")", u16Chars.at(index + 1));
-    case 0x874F:
-        return "MSGCODE_PLAYERNAME";
-    case 0x81F0:
-        return "MSGCODE_BEGINOCARINA";
-    //case 0x????:
-    //    return "MSGCODE_UNUSED_2"; // (Unused?) Fade out and wait; ignore following text. 
-    case 0x81F3:
-        charSize = 2;
-        aux1 = (u16Chars.at(index + 1) >> 8) & 0xFF;
-        aux2 = (u16Chars.at(index + 1) >> 0) & 0xFF;
-        return StringHelper::Sprintf("MSGCODE_PLAYSOUND(\"\\x%02X\", \"\\x%02X\")", aux1, aux2);
-    case 0x819A:
-        charSize = 2;
-        return StringHelper::Sprintf("MSGCODE_ITEMICON(\"\\x%02X\")", u16Chars.at(index + 1));
-    case 0x86C9:
-        charSize = 2;
-        return StringHelper::Sprintf("MSGCODE_TEXTSPEED(\"\\x%02X\")", u16Chars.at(index + 1));
-    case 0x86B3:
-        charSize = 3;
-        aux1 = (u16Chars.at(index + 1) >> 0) & 0xFF;
-        aux2 = (u16Chars.at(index + 2) >> 8) & 0xFF;
-        aux3 = (u16Chars.at(index + 2) >> 0) & 0xFF;
-        return StringHelper::Sprintf("MSGCODE_BACKGROUND(\"\\x%02X\", \"\\x%02X\", \"\\x%02X\")", aux1, aux2, aux3);
-    case 0x8791:
-        return "MSGCODE_MARATHONTIME";
-    case 0x8792:
-        return "MSGCODE_HORSERACETIME";
-    case 0x879B:
-        return "MSGCODE_HORSEBACKARCHERYSCORE";
-    case 0x86A3:
-        return "MSGCODE_GOLDSKULLTULATOTAL";
-    case 0x8199:
-        return "MSGCODE_NOSKIP";
-    case 0x81BC:
-        return "MSGCODE_TWOCHOICE";
-    case 0x81B8:
-        return "MSGCODE_THREECHOICE";
-    case 0x86A4:
-        return "MSGCODE_FISHSIZE";
-    case 0x869F:
-        charSize = 2;
-        return StringHelper::Sprintf("MSGCODE_HIGHSCORE(\"\\x%02X\")", u16Chars.at(index + 1));
-    case 0x81A1:
-        return "MSGCODE_TIME";
-
     // Special characters
-    case 0x839F:
-        return "MSGCODE_A_BTN";
-    case 0x83A0:
-        return "MSGCODE_B_BTN";
-    case 0x83A1:
-        return "MSGCODE_C_BTN";
-    case 0x83A2:
-        return "MSGCODE_L_BTN";
-    case 0x83A3:
-        return "MSGCODE_R_BTN";
-    case 0x83A4:
-        return "MSGCODE_Z_BTN";
-    case 0x83A5:
-        return "MSGCODE_CUP_BTN";
-    case 0x83A6:
-        return "MSGCODE_CDOWN_BTN";
-    case 0x83A7:
-        return "MSGCODE_CLEFT_BTN";
-    case 0x83A8:
-        return "MSGCODE_CRIGHT_BTN";
-    case 0x83A9:
-        return "MSGCODE_TARGET_ICON";
-    case 0x83AA:
-        return "MSGCODE_STICK";
-    case 0x83AB:
-        return "MSGCODE_DPAD";
+    if (((code >> 8) & 0xFF) == 0x83)
+    {
+        const auto& specialChar = specialCharactersOoT.find(code & 0xFF);
+        if (specialChar != specialCharactersOoT.end())
+        {
+            return specialChar->second;
+        }
+    }
+
+    // Codes
+    const auto& macroData = formatCodeMacrosJpnOoT.find(code);
+    if (macroData != formatCodeMacrosJpnOoT.end())
+    {
+        size_t macroParams = macroData->second.second;
+        charSize += (macroParams+1) / 2;
+        return MakeMacroWithArguments(2 * (index + 1), *macroData);
     }
 
     charSize = 0;
@@ -614,6 +522,8 @@ std::string ZMessage::MakeMacroWithArguments(size_t u8Index, const std::pair<uin
         return macroName;
     }
 
+    u8Index += GetMacroArgumentsPadding(code);
+
     std::string result = macroName;
     result += "(";
     for (size_t i = 0; i < params; i++)
@@ -634,6 +544,26 @@ std::string ZMessage::MakeMacroWithArguments(size_t u8Index, const std::pair<uin
     }
     result += ")";
     return result;
+}
+
+size_t ZMessage::GetMacroArgumentsPadding(uint16_t code)
+{
+    if (encoding == ZMessageEncoding::Jpn)
+    {
+        switch (code)
+        {
+        case 0x000B:
+        case 0x86C7:
+        case 0x81A3:
+        case 0x819E:
+        case 0x819A:
+        case 0x86B3:
+        case 0x86C9:
+        case 0x869F:
+            return 1;
+        }
+    }
+    return 0;
 }
 
 const char* ZMessage::GetSpecialCharacterMacro(uint8_t code)

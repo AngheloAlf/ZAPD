@@ -56,6 +56,7 @@ public:
 	std::string GetCnMacro(size_t index, size_t& charSize);
 
 	std::string MakeMacroWithArguments(size_t u8Index, const std::pair<uint16_t, std::pair<const char*, size_t>>& macroData);
+	size_t GetMacroArgumentsPadding(uint16_t code);
 
 	static const char* GetSpecialCharacterMacro(uint8_t code);
 	static const char* GetColorMacro(uint16_t code);
