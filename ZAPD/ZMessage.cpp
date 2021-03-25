@@ -1,9 +1,8 @@
 #include "ZMessage.h"
 #include "BitConverter.h"
 #include "StringHelper.h"
-#include <locale>
-#include <codecvt>
 #include <cassert>
+#include "Globals.h"
 
 
 ZMessage::ZMessage(tinyxml2::XMLElement* reader, const std::vector<uint8_t>& nRawData, int nRawDataIndex,
@@ -849,9 +848,9 @@ bool ZMessage::IsLineBreak(size_t index)
     {
     case ZMessageEncoding::Ascii:
     case ZMessageEncoding::Cn:
-        return u8Chars.at(index) == 0x01;
+        return IsCodeLineBreak(u8Chars.at(index), encoding);
     case ZMessageEncoding::Jpn:
-        return u16Chars.at(index) == 0x000A;
+        return IsCodeLineBreak(u16Chars.at(index), encoding);
     default:
         return false;
     }
@@ -871,14 +870,48 @@ bool ZMessage::IsEndMarker(size_t index)
     }
 }
 
+bool ZMessage::IsCodeLineBreak(uint16_t code, ZMessageEncoding encoding)
+{
+    switch (encoding)
+    {
+    case ZMessageEncoding::Ascii:
+    case ZMessageEncoding::Cn:
+        if (Globals::Instance->game == ZGame::MM_RETAIL)
+        {
+            return code == 0x11;
+        }
+        // OoT // TODO: check if this works for SW97
+        return code == 0x01;
+    case ZMessageEncoding::Jpn:
+        if (Globals::Instance->game == ZGame::MM_RETAIL)
+        {
+            return code == 0x000A;
+        }
+        // OoT
+        return code == 0x000A;
+    default:
+        return false;
+    }
+}
+
 bool ZMessage::IsCodeEndMarker(uint16_t code, ZMessageEncoding encoding)
 {
     switch (encoding)
     {
     case ZMessageEncoding::Ascii:
     case ZMessageEncoding::Cn:
+        if (Globals::Instance->game == ZGame::MM_RETAIL)
+        {
+            return code == 0xBF;
+        }
+        // OoT // TODO: check if this works for SW97
         return code == 0x02;
     case ZMessageEncoding::Jpn:
+        if (Globals::Instance->game == ZGame::MM_RETAIL)
+        {
+            return code == 0x0500;
+        }
+        // OoT
         return code == 0x8170;
     default:
         return false;
