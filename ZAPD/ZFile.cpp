@@ -78,7 +78,7 @@ void ZFile::ParseXML(ZFileMode mode, XMLElement* reader, std::string filename, b
 	// TODO: This should be a variable on the ZFile, but it is a large change in order to force all
 	// ZResource types to have a parent ZFile.
 	const char* gameStr = reader->Attribute("Game");
-	if (reader->Attribute("Game") != nullptr)
+	if (gameStr != nullptr)
 	{
 		if (string(gameStr) == "MM")
 		{
@@ -88,9 +88,11 @@ void ZFile::ParseXML(ZFileMode mode, XMLElement* reader, std::string filename, b
 		{
 			Globals::Instance->game = ZGame::OOT_SW97;
 		}
-		else
+		else if(string(gameStr) != "OOT")
 		{
-			// TODO: Error here.
+			throw std::runtime_error(StringHelper::Sprintf(
+				"ZFile::ParseXML: Error in '%s'.\n\t Invalid value '%s' for attribute xml 'Game'.\n",
+		        name.c_str(), gameStr));
 		}
 	}
 
