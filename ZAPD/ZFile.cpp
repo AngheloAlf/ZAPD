@@ -14,6 +14,7 @@
 #include "ZDisplayList.h"
 #include "ZLimb.h"
 #include "ZMessage.h"
+#include "ZMessageHeader.h"
 #include "ZRoom/ZRoom.h"
 #include "ZScalar.h"
 #include "ZSkeleton.h"
@@ -421,6 +422,22 @@ void ZFile::ParseXML(ZFileMode mode, XMLElement* reader, std::string filename, b
 			}
 			resources.push_back(msg);
 			rawDataIndex += msg->GetRawDataSizeWithPadding();
+		}
+		else if (string(child->Name()) == "MessageHeader")
+		{
+			ZMessageHeader* msgHeader = nullptr;
+
+			if (mode == ZFileMode::Extract)
+			{
+				msgHeader = ZMessageHeader::ExtractFromXML(child, rawData, rawDataIndex, folderName, this);
+			}
+
+			if (msgHeader == nullptr)
+			{
+				throw std::runtime_error("Couldn't create ZMessageHeader.");
+			}
+			resources.push_back(msgHeader);
+			rawDataIndex += msgHeader->GetRawDataSizeWithMessage();
 		}
 		else
 		{

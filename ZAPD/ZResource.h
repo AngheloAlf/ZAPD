@@ -43,6 +43,7 @@ enum class ZResourceType
 	CollisionHeader,
 	Symbol,
 	Message,
+	MessageHeader,
 };
 
 class ZResource

@@ -23,7 +23,7 @@ ZMessage::ZMessage(ZMessageEncoding nEncoding, const std::string& prefix,
 	rawDataIndex = nRawDataIndex;
 	parent = nParent;
 
-	name = StringHelper::Sprintf("%sMessage_%06X", prefix.c_str(), rawDataIndex);
+	name = GetDefaultName(prefix.c_str(), rawDataIndex);
 	encoding = nEncoding;
 
 	ParseRawData();
@@ -116,14 +116,7 @@ ZMessage* ZMessage::ExtractFromXML(tinyxml2::XMLElement* reader,
 	ZMessage* message = new ZMessage(reader, nRawData, nRawDataIndex, nParent);
 	message->relativePath = std::move(nRelPath);
 
-    std::string auxName = message->GetName();
-    if (auxName == "")
-    {
-        auxName = GetDefaultName("", nRawDataIndex);
-    }
-	message->parent->AddDeclarationArray(message->rawDataIndex, DeclarationAlignment::None,
-	                                 message->GetRawDataSize(), message->GetSourceTypeName(),
-	                                 auxName, message->GetRawDataSize(), "");
+    message->DeclareVar("", "");
 
 	return message;
 }
@@ -136,6 +129,17 @@ int ZMessage::GetRawDataSize()
 size_t ZMessage::GetRawDataSizeWithPadding()
 {
     return u8Chars.size() + padding;
+}
+
+void ZMessage::DeclareVar(const std::string& prefix, const std::string& bodyStr)
+{
+    std::string auxName = name;
+    if (name == "")
+    {
+        auxName = GetDefaultName(prefix, rawDataIndex);
+    }
+    parent->AddDeclarationArray(rawDataIndex, DeclarationAlignment::None, GetRawDataSize(),
+                            GetSourceTypeName(), auxName, GetRawDataSize(), bodyStr);
 }
 
 std::string ZMessage::GetBodySourceCode()
@@ -192,13 +196,7 @@ std::string ZMessage::GetSourceOutputCode(const std::string& prefix)
 	Declaration* decl = parent->GetDeclaration(rawDataIndex);
 	if (decl == nullptr)
 	{
-        std::string auxName = name;
-        if (name == "")
-        {
-            auxName = GetDefaultName(prefix, rawDataIndex);
-        }
-		parent->AddDeclarationArray(rawDataIndex, DeclarationAlignment::None, GetRawDataSize(),
-		                       GetSourceTypeName(), auxName, GetRawDataSize(), bodyStr);
+        DeclareVar(prefix, bodyStr);
 	}
 	else
 	{

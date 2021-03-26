@@ -14,9 +14,8 @@
 enum class ZMessageEncoding
 {
 	Ascii, // TODO: think in a proper name
-	Jpn,
+	Jpn, // Shift-Jis
 	Cn,
-	//Tw,
 };
 
 class ZMessage : public ZResource
@@ -54,6 +53,8 @@ public:
 
 	int GetRawDataSize() override;
 	size_t GetRawDataSizeWithPadding();
+
+	void DeclareVar(const std::string& prefix, const std::string& bodyStr);
 
 	std::string GetBodySourceCode();
 	std::string GetSourceOutputCode(const std::string& prefix) override;
@@ -196,6 +197,8 @@ public:
 		{ 0x12, { "MSGCODE_LINE_FEED", 0 } }, // Used when three lines of text have been printed.
 		{ 0x13, { "MSGCODE_CARRIAGE_RETURN", 0 } }, // Reset Cursor Position to Start of Current Line.
 		{ 0x14, { "MSGCODE_INDENT", 1 } }, // Print: xx Spaces
+		{ 0x17, { "MSGCODE_INSTANT_ON", 0 } }, // Enable: Instantaneous Text
+		{ 0x18, { "MSGCODE_INSTANT_OFF", 0 } }, // Disable: Instantaneous Text
 
 		{ 0x1B, { "MSGCODE_DELAY_", 2 } }, // Delay for xxxx Before Printing Remaining Text
 		{ 0x1C, { "MSGCODE_KEPTTEXT", 2 } }, // Keep Text on Screen for xxxx Before Closing
@@ -222,6 +225,8 @@ public:
 		{ 0x000B, { "MSGCODE_LINE_FEED", 0 } }, // Used when three lines of text have been printed.
 		{ 0x000C, { "MSGCODE_CARRIAGE_RETURN", 0 } }, // Reset Cursor Position to Start of Current Line.
 		{ 0x001F, { "MSGCODE_INDENT", 1 } }, // Print: xx Spaces
+		{ 0x0101, { "MSGCODE_INSTANT_ON", 0 } }, // Enable: Instantaneous Text
+		{ 0x0102, { "MSGCODE_INSTANT_OFF", 0 } }, // Disable: Instantaneous Text
 
 		{ 0x0110, { "MSGCODE_DELAY_", 2 } }, // Delay for xxxx Before Printing Remaining Text
 		{ 0x0111, { "MSGCODE_KEPTTEXT", 2 } }, // Keep Text on Screen for xxxx Before Closing
