@@ -158,7 +158,7 @@ ZCollisionHeader::ZCollisionHeader(ZFile* parent, const std::string& prefix,
 
 		if (vtxAddress != 0)
 			parent->AddDeclarationArray(
-				vtxSegmentOffset, DeclarationAlignment::None, vertices.size() * 6, "Vec3s",
+				vtxSegmentOffset, DeclarationAlignment::Align8, vertices.size() * 6, "Vec3s",
 				StringHelper::Sprintf("%s_vtx_%08X", prefix.c_str(), vtxSegmentOffset), 0,
 				declaration);
 
@@ -313,7 +313,7 @@ CameraDataList::CameraDataList(ZFile* parent, const std::string& prefix,
 	}
 
 	parent->AddDeclarationArray(
-		rawDataIndex, DeclarationAlignment::None, entries.size() * 8, "CamData",
+		rawDataIndex, DeclarationAlignment::Align8, entries.size() * 8, "CamData",
 		StringHelper::Sprintf("%s_camDataList_%08X", prefix.c_str(), rawDataIndex), entries.size(),
 		declaration);
 
@@ -335,7 +335,7 @@ CameraDataList::CameraDataList(ZFile* parent, const std::string& prefix,
 		int cameraPosDataIndex = cameraPosDataSeg & 0x00FFFFFF;
 		int entrySize = numDataTotal * 0x6;
 		parent->AddDeclarationArray(
-			cameraPosDataIndex, DeclarationAlignment::None, entrySize, "Vec3s",
+			cameraPosDataIndex, DeclarationAlignment::Align8, entrySize, "Vec3s",
 			StringHelper::Sprintf("%s_camPosData_%08X", prefix.c_str(), cameraPosDataIndex),
 			numDataTotal, declaration);
 	}

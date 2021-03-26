@@ -854,7 +854,7 @@ string ZFile::ProcessDeclarations()
 	{
 		if (item.second->alignment != DeclarationAlignment::None)
 		{
-			while (item.second->size % 4 != 0)
+			while ((item.first + item.second->size) % 4 != 0)
 			{
 				item.second->size++;
 			}

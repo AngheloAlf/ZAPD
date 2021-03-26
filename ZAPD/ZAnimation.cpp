@@ -373,7 +373,7 @@ void ZCurveAnimation::PreGenValues(const std::string& prefix)
 		Declaration* decl = parent->GetDeclaration(refIndexOffset);
 		if (decl == nullptr)
 		{
-			parent->AddDeclarationArray(refIndexOffset, DeclarationAlignment::None,
+			parent->AddDeclarationArray(refIndexOffset, DeclarationAlignment::Align4,
 			                            arrayItemCnt * 1, "u8", refIndexStr, arrayItemCnt,
 			                            entryStr);
 		}

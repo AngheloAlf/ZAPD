@@ -50,7 +50,7 @@ std::string ZArray::GetSourceOutputCode(const std::string& prefix)
 	}
 
 	if (parent != nullptr)
-		parent->AddDeclarationArray(rawDataIndex, DeclarationAlignment::None, GetRawDataSize(),
+		parent->AddDeclarationArray(rawDataIndex, DeclarationAlignment::Align4, GetRawDataSize(),
 		                            res->GetSourceTypeName(), name, arrayCnt, output);
 
 	return "";
