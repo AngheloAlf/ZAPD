@@ -108,7 +108,7 @@ std::string ZVector::GetSourceValue()
 std::string ZVector::GetSourceOutputCode(const std::string& prefix)
 {
 	if (parent != nullptr)
-		parent->AddDeclaration(rawDataIndex, DeclarationAlignment::None, GetRawDataSize(),
+		parent->AddDeclaration(rawDataIndex, DeclarationAlignment::Align4, GetRawDataSize(),
 		                       GetSourceTypeName(), GetName(), GetSourceValue());
 
 	return "";

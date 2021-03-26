@@ -84,7 +84,7 @@ string SetPathways::GenerateSourceCodePass2(string roomName, int baseAddress)
 		                                           roomName.c_str(), listSegmentOffset);
 
 		zRoom->parent->AddDeclaration(
-			segmentOffset, DeclarationAlignment::None, DeclarationPadding::None, 8, "Path",
+			segmentOffset, DeclarationAlignment::Align4, DeclarationPadding::None, 8, "Path",
 			StringHelper::Sprintf("%sPathway0x%06X", roomName.c_str(), segmentOffset), declaration);
 	}
 
@@ -104,7 +104,7 @@ string SetPathways::GenerateSourceCodePass2(string roomName, int baseAddress)
 		}
 
 		zRoom->parent->AddDeclarationArray(
-			listSegmentOffset, DeclarationAlignment::None, DeclarationPadding::None,
+			listSegmentOffset, DeclarationAlignment::Align4, DeclarationPadding::None,
 			pathways.size() * 6, "Vec3s",
 			StringHelper::Sprintf("%sPathwayList0x%06X", roomName.c_str(), listSegmentOffset),
 			pathways.size(), declaration);

@@ -36,7 +36,7 @@ SetLightingSettings::SetLightingSettings(ZRoom* nZRoom, std::vector<uint8_t> raw
 		}
 
 		zRoom->parent->AddDeclarationArray(
-			segmentOffset, DeclarationAlignment::None, DeclarationPadding::None, numLights * 22,
+			segmentOffset, DeclarationAlignment::Align4, DeclarationPadding::None, numLights * 22,
 			"LightSettings",
 			StringHelper::Sprintf("%sLightSettings0x%06X", zRoom->GetName().c_str(), segmentOffset),
 			numLights, declaration);

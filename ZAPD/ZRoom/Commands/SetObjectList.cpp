@@ -53,7 +53,7 @@ string SetObjectList::GenerateSourceCodePass1(string roomName, int baseAddress)
 	}
 
 	zRoom->parent->AddDeclarationArray(
-		segmentOffset, DeclarationAlignment::None, objects.size() * 2, "s16",
+		segmentOffset, DeclarationAlignment::Align4, objects.size() * 2, "s16",
 		StringHelper::Sprintf("%sObjectList0x%06X", zRoom->GetName().c_str(), segmentOffset),
 		objects.size(), declaration);
 

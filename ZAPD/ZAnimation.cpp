@@ -432,7 +432,7 @@ void ZCurveAnimation::PreGenValues(const std::string& prefix)
 		Declaration* decl = parent->GetDeclaration(copyValuesOffset);
 		if (decl == nullptr)
 		{
-			parent->AddDeclarationArray(copyValuesOffset, DeclarationAlignment::None,
+			parent->AddDeclarationArray(copyValuesOffset, DeclarationAlignment::Align4,
 			                            arrayItemCnt * 2, "s16", copyValuesStr, arrayItemCnt,
 			                            entryStr);
 		}
