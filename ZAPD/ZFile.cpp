@@ -852,57 +852,60 @@ string ZFile::ProcessDeclarations()
 
 	for (pair<int32_t, Declaration*> item : declarations)
 	{
-		while (item.second->size % 4 != 0)
+		if (item.second->alignment != DeclarationAlignment::None)
 		{
-			item.second->size++;
-		}
-
-		if (lastAddr != 0)
-		{
-			if (item.second->alignment == DeclarationAlignment::Align16)
+			while (item.second->size % 4 != 0)
 			{
-				// int lastAddrSizeTest = declarations[lastAddr]->size;
-				int curPtr = lastAddr + declarations[lastAddr]->size;
-
-				while (curPtr % 4 != 0)
-				{
-					declarations[lastAddr]->size++;
-					// item.second->size++;
-					curPtr++;
-				}
-
-				/*while (curPtr % 16 != 0)
-				{
-				    char buffer[2048];
-
-				    sprintf(buffer, "static u32 align%02X = 0;\n", curPtr);
-				    item.second->text = buffer + item.second->text;
-
-				    declarations[lastAddr]->size += 4;
-				    curPtr += 4;
-				}*/
+				item.second->size++;
 			}
-			else if (item.second->alignment == DeclarationAlignment::Align8)
+
+			if (lastAddr != 0)
 			{
-				int curPtr = lastAddr + declarations[lastAddr]->size;
-
-				while (curPtr % 4 != 0)
+				if (item.second->alignment == DeclarationAlignment::Align16)
 				{
-					declarations[lastAddr]->size++;
-					// item.second->size++;
-					curPtr++;
+					// int lastAddrSizeTest = declarations[lastAddr]->size;
+					int curPtr = lastAddr + declarations[lastAddr]->size;
+
+					while (curPtr % 4 != 0)
+					{
+						declarations[lastAddr]->size++;
+						// item.second->size++;
+						curPtr++;
+					}
+
+					/*while (curPtr % 16 != 0)
+					{
+						char buffer[2048];
+
+						sprintf(buffer, "static u32 align%02X = 0;\n", curPtr);
+						item.second->text = buffer + item.second->text;
+
+						declarations[lastAddr]->size += 4;
+						curPtr += 4;
+					}*/
 				}
-
-				while (curPtr % 8 != 0)
+				else if (item.second->alignment == DeclarationAlignment::Align8)
 				{
-					char buffer[2048];
+					int curPtr = lastAddr + declarations[lastAddr]->size;
 
-					sprintf(buffer, "static u32 align%02X = 0;\n", curPtr);
-					item.second->preText = buffer + item.second->preText;
+					while (curPtr % 4 != 0)
+					{
+						declarations[lastAddr]->size++;
+						// item.second->size++;
+						curPtr++;
+					}
 
-					declarations[lastAddr]->size += 4;
-					// item.second->size += 4;
-					curPtr += 4;
+					while (curPtr % 8 != 0)
+					{
+						char buffer[2048];
+
+						sprintf(buffer, "static u32 align%02X = 0;\n", curPtr);
+						item.second->preText = buffer + item.second->preText;
+
+						declarations[lastAddr]->size += 4;
+						// item.second->size += 4;
+						curPtr += 4;
+					}
 				}
 			}
 		}
