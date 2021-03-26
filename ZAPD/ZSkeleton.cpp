@@ -226,7 +226,7 @@ std::string ZSkeleton::GetSourceOutputCode(const std::string& prefix)
 			tblStr += decl;
 		}
 
-		parent->AddDeclarationArray(ptr, DeclarationAlignment::None, 4 * limbCount, limbArrTypeStr,
+		parent->AddDeclarationArray(ptr, DeclarationAlignment::Align4, 4 * limbCount, limbArrTypeStr,
 		                            StringHelper::Sprintf("%sLimbs", defaultPrefix.c_str()),
 		                            limbCount, tblStr);
 	}

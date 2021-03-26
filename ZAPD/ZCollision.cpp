@@ -96,7 +96,7 @@ ZCollisionHeader::ZCollisionHeader(ZFile* parent, const std::string& prefix,
 
 	if (waterBoxAddress != 0)
 		parent->AddDeclarationArray(
-			waterBoxSegmentOffset, DeclarationAlignment::None, 16 * waterBoxes.size(), "WaterBox",
+			waterBoxSegmentOffset, DeclarationAlignment::Align4, 16 * waterBoxes.size(), "WaterBox",
 			StringHelper::Sprintf("%s_waterBoxes_%08X", prefix.c_str(), waterBoxSegmentOffset), 0,
 			declaration);
 
@@ -117,7 +117,7 @@ ZCollisionHeader::ZCollisionHeader(ZFile* parent, const std::string& prefix,
 		if (polyAddress != 0)
 		{
 			parent->AddDeclarationArray(
-				polySegmentOffset, DeclarationAlignment::None, polygons.size() * 16,
+				polySegmentOffset, DeclarationAlignment::Align4, polygons.size() * 16,
 				"CollisionPoly",
 				StringHelper::Sprintf("%s_polygons_%08X", prefix.c_str(), polySegmentOffset), 0,
 				declaration);
@@ -136,7 +136,7 @@ ZCollisionHeader::ZCollisionHeader(ZFile* parent, const std::string& prefix,
 
 	if (polyTypeDefAddress != 0)
 		parent->AddDeclarationArray(
-			polyTypeDefSegmentOffset, DeclarationAlignment::None, polygonTypes.size() * 8,
+			polyTypeDefSegmentOffset, DeclarationAlignment::Align4, polygonTypes.size() * 8,
 			"SurfaceType",
 			StringHelper::Sprintf("%s_surfaceType_%08X", prefix.c_str(), polyTypeDefSegmentOffset),
 			0, declaration);
@@ -185,7 +185,7 @@ ZCollisionHeader::ZCollisionHeader(ZFile* parent, const std::string& prefix,
 		prefix.c_str(), polyTypeDefSegmentOffset, prefix.c_str(), camDataSegmentOffset,
 		numWaterBoxes, waterBoxStr);
 
-	parent->AddDeclaration(rawDataIndex, DeclarationAlignment::None, DeclarationPadding::Pad16, 44,
+	parent->AddDeclaration(rawDataIndex, DeclarationAlignment::Align4, DeclarationPadding::Pad16, 44,
 	                       "CollisionHeader",
 	                       StringHelper::Sprintf("%s", prefix.c_str(), rawDataIndex), declaration);
 }

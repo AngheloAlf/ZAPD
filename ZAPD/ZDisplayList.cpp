@@ -1895,7 +1895,7 @@ string ZDisplayList::GetSourceOutputCode(const std::string& prefix)
 
 			if (parent != nullptr)
 			{
-				parent->AddDeclarationArray(item.first, DeclarationAlignment::None,
+				parent->AddDeclarationArray(item.first, DeclarationAlignment::Align8,
 				                            item.second.size() * 16, "static Vtx",
 				                            StringHelper::Sprintf("%sVtx_%06X", prefix.c_str(),
 				                                                  item.first, item.second.size()),
@@ -2014,7 +2014,7 @@ string ZDisplayList::GetSourceOutputCode(const std::string& prefix)
 	if (parent != nullptr)
 	{
 		Declaration* decl = parent->AddDeclarationArray(
-			rawDataIndex, DeclarationAlignment::None, GetRawDataSize(), "Gfx",
+			rawDataIndex, DeclarationAlignment::Align8, GetRawDataSize(), "Gfx",
 			StringHelper::Sprintf("%s", name.c_str()), 0, sourceOutput);
 		decl->references = references;
 		return "";

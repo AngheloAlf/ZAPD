@@ -66,7 +66,7 @@ std::string ZNormalAnimation::GetSourceOutputCode(const std::string& prefix)
 		string headerStr =
 			StringHelper::Sprintf("{ %i }, %sFrameData, %sJointIndices, %i", frameCount,
 		                          defaultPrefix.c_str(), defaultPrefix.c_str(), limit);
-		parent->AddDeclaration(rawDataIndex, DeclarationAlignment::None, GetRawDataSize(), GetSourceTypeName(),
+		parent->AddDeclaration(rawDataIndex, DeclarationAlignment::Align4, GetRawDataSize(), GetSourceTypeName(),
 		                       StringHelper::Sprintf("%s", name.c_str()), headerStr);
 
 		string indicesStr = "";
@@ -175,7 +175,7 @@ std::string ZLinkAnimation::GetSourceOutputCode(const std::string& prefix)
 								   segmentAddress, StringHelper::Sprintf("%sSeg%06X", name.c_str(),
 		                                                                 segmentAddress));
 		string headerStr = StringHelper::Sprintf("{ %i }, 0x%08X", frameCount, segmentAddress);
-		parent->AddDeclaration(rawDataIndex, DeclarationAlignment::None, GetRawDataSize(), GetSourceTypeName(),
+		parent->AddDeclaration(rawDataIndex, DeclarationAlignment::Align4, GetRawDataSize(), GetSourceTypeName(),
 		                       StringHelper::Sprintf("%s", name.c_str()), headerStr);
 	}
 
@@ -403,7 +403,7 @@ void ZCurveAnimation::PreGenValues(const std::string& prefix)
 		Declaration* decl = parent->GetDeclaration(transformDataOffset);
 		if (decl == nullptr)
 		{
-			parent->AddDeclarationArray(transformDataOffset, DeclarationAlignment::None,
+			parent->AddDeclarationArray(transformDataOffset, DeclarationAlignment::Align4,
 			                            arrayItemCnt * TransformData::GetRawDataSize(),
 			                            TransformData::GetSourceTypeName(), transformDataStr,
 			                            arrayItemCnt, entryStr);
@@ -511,7 +511,7 @@ std::string ZCurveAnimation::GetSourceOutputCode(const std::string& prefix)
 	Declaration* decl = parent->GetDeclaration(address);
 	if (decl == nullptr)
 	{
-		parent->AddDeclaration(address, DeclarationAlignment::None, GetRawDataSize(),
+		parent->AddDeclaration(address, DeclarationAlignment::Align4, GetRawDataSize(),
 		                       GetSourceTypeName(), name, bodyStr);
 	}
 	else

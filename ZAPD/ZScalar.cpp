@@ -227,8 +227,24 @@ std::string ZScalar::GetSourceValue()
 
 std::string ZScalar::GetSourceOutputCode(const std::string& prefix)
 {
+	DeclarationAlignment align = DeclarationAlignment::None;
+	switch (scalarType)
+	{
+	case ZSCALAR_S16:
+	case ZSCALAR_U16:
+	case ZSCALAR_S32:
+	case ZSCALAR_U32:
+	case ZSCALAR_F32:
+		align = DeclarationAlignment::Align4;
+		break;
+	case ZSCALAR_S64:
+	case ZSCALAR_U64:
+	case ZSCALAR_F64:
+		align = DeclarationAlignment::Align8;
+		break;
+	}
 	if (parent != nullptr)
-		parent->AddDeclaration(rawDataIndex, DeclarationAlignment::None, GetRawDataSize(),
+		parent->AddDeclaration(rawDataIndex, align, GetRawDataSize(),
 		                       GetSourceTypeName(), GetName(), GetSourceValue());
 
 	return "";
