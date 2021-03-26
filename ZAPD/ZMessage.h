@@ -182,15 +182,53 @@ public:
 	inline static const std::map<uint16_t, std::pair<const char*, size_t>> formatCodeMacrosAsciiMM = {
 		// { code, { "macro name", number of arguments (in bytes) } },
 		{ 0x00, { "MSGCODE_COLOR_DEFAULT", 0 } },
+		{ 0x01, { "MSGCODE_COLOR_RED", 0 } },
+		{ 0x02, { "MSGCODE_COLOR_GREEN", 0 } },
+		{ 0x03, { "MSGCODE_COLOR_BLUE", 0 } },
+		{ 0x04, { "MSGCODE_COLOR_YELLOW", 0 } },
+		{ 0x05, { "MSGCODE_COLOR_TURQUOISE", 0 } },
+		{ 0x06, { "MSGCODE_COLOR_PINK", 0 } },
+		{ 0x07, { "MSGCODE_COLOR_SILVER", 0 } },
+		{ 0x08, { "MSGCODE_COLOR_ORANGE", 0 } },
+
+		{ 0x10, { "MSGCODE_BOXBREAK", 0 } }, // Used when four lines of text have been printed, but can technically be used anywhere.
 		{ 0x11, { "MSGCODE_LINEBREAK", 0 } },
-		{ 0x14, { "MSGCODE_INDENT", 1 } }, // Print: xx Spaces 
+		{ 0x12, { "MSGCODE_LINE_FEED", 0 } }, // Used when three lines of text have been printed.
+		{ 0x13, { "MSGCODE_CARRIAGE_RETURN", 0 } }, // Reset Cursor Position to Start of Current Line.
+		{ 0x14, { "MSGCODE_INDENT", 1 } }, // Print: xx Spaces
+
+		{ 0x1B, { "MSGCODE_DELAY_", 2 } }, // Delay for xxxx Before Printing Remaining Text
+		{ 0x1C, { "MSGCODE_KEPTTEXT", 2 } }, // Keep Text on Screen for xxxx Before Closing
+		{ 0x1D, { "MSGCODE_DELAY_CONVERSATION_END", 2 } }, // Delay for xxxx Before Ending Conversation
+		{ 0x1E, { "MSGCODE_PLAYSOUND", 2 } }, // Play Sound Effect xxxx
+		{ 0x1F, { "MSGCODE_DELAY_TEXTFLOW", 2 } }, // Delay for xxxx Before Resuming Text Flow
+
 		{ 0xBF, { "MSGCODE_ENDMARKER", 0 } },
 	};
 	inline static const std::map<uint16_t, std::pair<const char*, size_t>> formatCodeMacrosJpnMM = {
 		// { code, { "macro name", number of arguments (in bytes) } },
 		{ 0x2000, { "MSGCODE_COLOR_DEFAULT", 0 } },
+		{ 0x2001, { "MSGCODE_COLOR_RED", 0 } },
+		{ 0x2002, { "MSGCODE_COLOR_GREEN", 0 } },
+		{ 0x2003, { "MSGCODE_COLOR_BLUE", 0 } },
+		{ 0x2004, { "MSGCODE_COLOR_YELLOW", 0 } },
+		{ 0x2005, { "MSGCODE_COLOR_TURQUOISE", 0 } },
+		{ 0x2006, { "MSGCODE_COLOR_PINK", 0 } },
+		{ 0x2007, { "MSGCODE_COLOR_SILVER", 0 } },
+		{ 0x2008, { "MSGCODE_COLOR_ORANGE", 0 } },
+
+		{ 0x0009, { "MSGCODE_BOXBREAK", 0 } }, // Used when four lines of text have been printed, but can technically be used anywhere.
 		{ 0x000A, { "MSGCODE_LINEBREAK", 0 } },
-		{ 0x001F, { "MSGCODE_INDENT", 1 } }, // Print: xx Spaces 
+		{ 0x000B, { "MSGCODE_LINE_FEED", 0 } }, // Used when three lines of text have been printed.
+		{ 0x000C, { "MSGCODE_CARRIAGE_RETURN", 0 } }, // Reset Cursor Position to Start of Current Line.
+		{ 0x001F, { "MSGCODE_INDENT", 1 } }, // Print: xx Spaces
+
+		{ 0x0110, { "MSGCODE_DELAY_", 2 } }, // Delay for xxxx Before Printing Remaining Text
+		{ 0x0111, { "MSGCODE_KEPTTEXT", 2 } }, // Keep Text on Screen for xxxx Before Closing
+		{ 0x0112, { "MSGCODE_DELAY_CONVERSATION_END", 2 } }, // Delay for xxxx Before Ending Conversation
+		{ 0x0120, { "MSGCODE_PLAYSOUND", 2 } }, // Play Sound Effect xxxx
+		{ 0x0128, { "MSGCODE_DELAY_TEXTFLOW", 2 } }, // Delay for xxxx Before Resuming Text Flow
+
 		{ 0x0500, { "MSGCODE_ENDMARKER", 0 } },
 	};
 
