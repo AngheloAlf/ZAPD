@@ -145,6 +145,7 @@ public:
 		{ 0x869F, { "MSGCODE_HIGHSCORE", 1 } },
 		{ 0x81A1, { "MSGCODE_TIME", 0 } },
 	};
+
 	inline static const std::map<uint16_t, const char*> specialCharactersOoT = {
 		// { code, "macro name" },
 		{ 0x96, "MSGCODE_E_ACUTE_LOWERCASE" }, // "é"
@@ -176,5 +177,58 @@ public:
 		{ 5, "PINK" },
 		{ 6, "YELLOW" },
 		{ 7, "WHITE" },
+	};
+
+	inline static const std::map<uint16_t, std::pair<const char*, size_t>> formatCodeMacrosAsciiMM = {
+		// { code, { "macro name", number of arguments (in bytes) } },
+		{ 0x00, { "MSGCODE_COLOR_DEFAULT", 0 } },
+		{ 0x11, { "MSGCODE_LINEBREAK", 0 } },
+		{ 0x14, { "MSGCODE_INDENT", 1 } }, // Print: xx Spaces 
+		{ 0xBF, { "MSGCODE_ENDMARKER", 0 } },
+	};
+	inline static const std::map<uint16_t, std::pair<const char*, size_t>> formatCodeMacrosJpnMM = {
+		// { code, { "macro name", number of arguments (in bytes) } },
+		{ 0x2000, { "MSGCODE_COLOR_DEFAULT", 0 } },
+		{ 0x000A, { "MSGCODE_LINEBREAK", 0 } },
+		{ 0x001F, { "MSGCODE_INDENT", 1 } }, // Print: xx Spaces 
+		{ 0x0500, { "MSGCODE_ENDMARKER", 0 } },
+	};
+
+	inline static const std::map<uint16_t, const char*> specialCharactersAsciiMM = {
+		// { code, "macro name" },
+		{ 0x9D, "MSGCODE_E_ACUTE_LOWERCASE" }, // "é"
+
+		{ 0xB0, "MSGCODE_A_BTN" },
+		{ 0xB1, "MSGCODE_B_BTN" },
+		{ 0xB2, "MSGCODE_C_BTN" },
+
+		{ 0xB3, "MSGCODE_L_BTN" },
+		{ 0xB4, "MSGCODE_R_BTN" },
+		{ 0xB5, "MSGCODE_Z_BTN" },
+
+		{ 0xB6, "MSGCODE_CUP_BTN" },
+		{ 0xB7, "MSGCODE_CDOWN_BTN" },
+		{ 0xB8, "MSGCODE_CLEFT_BTN" },
+		{ 0xB9, "MSGCODE_CRIGHT_BTN" },
+
+		{ 0xBA, "MSGCODE_TARGET_ICON" },
+		{ 0xBB, "MSGCODE_STICK" },
+		// { 0x??, "MSGCODE_DPAD" }, // Unused.
+	};
+	inline static const std::map<uint16_t, const char*> specialCharactersJpnMM = {
+		// { code, "macro name" },
+		{ 0x899F, "MSGCODE_A_BTN" },
+		{ 0x89A0, "MSGCODE_B_BTN" },
+		{ 0x89A1, "MSGCODE_C_BTN" },
+		{ 0x89A2, "MSGCODE_L_BTN" },
+		{ 0x89A3, "MSGCODE_R_BTN" },
+		{ 0x89A4, "MSGCODE_Z_BTN" },
+		{ 0x89A5, "MSGCODE_CUP_BTN" },
+		{ 0x89A6, "MSGCODE_CDOWN_BTN" },
+		{ 0x89A7, "MSGCODE_CLEFT_BTN" },
+		{ 0x89A8, "MSGCODE_CRIGHT_BTN" },
+		{ 0x89A9, "MSGCODE_TARGET_ICON" },
+		{ 0x89AA, "MSGCODE_STICK" },
+		{ 0x89AB, "MSGCODE_DPAD" }, // Unused.
 	};
 };

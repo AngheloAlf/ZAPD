@@ -323,20 +323,41 @@ std::string ZMessage::GetAsciiMacro(size_t index, size_t& codeSize)
     codeSize = 1;
     uint8_t code = u8Chars.at(index);
 
-    // Special characters
-    const auto& specialChar = specialCharactersOoT.find(code);
-    if (specialChar != specialCharactersOoT.end())
+    if (Globals::Instance->game == ZGame::MM_RETAIL)
     {
-        return specialChar->second;
-    }
+        // Special characters
+        const auto& specialChar = specialCharactersAsciiMM.find(code);
+        if (specialChar != specialCharactersAsciiMM.end())
+        {
+            return specialChar->second;
+        }
 
-    // Codes
-    const auto& macroData = formatCodeMacrosAsciiOoT.find(code);
-    if (macroData != formatCodeMacrosAsciiOoT.end())
+        // Codes
+        const auto& macroData = formatCodeMacrosAsciiMM.find(code);
+        if (macroData != formatCodeMacrosAsciiMM.end())
+        {
+            size_t macroParams = macroData->second.second;
+            codeSize += macroParams;
+            return MakeMacroWithArguments(index+1, *macroData);
+        }
+    }
+    else
     {
-        size_t macroParams = macroData->second.second;
-        codeSize += macroParams;
-        return MakeMacroWithArguments(index+1, *macroData);
+        // Special characters
+        const auto& specialChar = specialCharactersOoT.find(code);
+        if (specialChar != specialCharactersOoT.end())
+        {
+            return specialChar->second;
+        }
+
+        // Codes
+        const auto& macroData = formatCodeMacrosAsciiOoT.find(code);
+        if (macroData != formatCodeMacrosAsciiOoT.end())
+        {
+            size_t macroParams = macroData->second.second;
+            codeSize += macroParams;
+            return MakeMacroWithArguments(index+1, *macroData);
+        }
     }
 
     codeSize = 0;
@@ -362,13 +383,27 @@ std::string ZMessage::GetJpnMacro(size_t index, size_t& codeSize)
     }
 
     // Codes
-    const auto& macroData = formatCodeMacrosJpnOoT.find(code);
-    if (macroData != formatCodeMacrosJpnOoT.end())
+    if (Globals::Instance->game == ZGame::MM_RETAIL)
     {
-        size_t macroParams = macroData->second.second;
-        // Params amount is in bytes, but we want halfs (or 2bytes).
-        codeSize += (macroParams+1) / 2;
+        const auto& macroData = formatCodeMacrosJpnMM.find(code);
+        if (macroData != formatCodeMacrosJpnMM.end())
+        {
+            size_t macroParams = macroData->second.second;
+            // Params amount is in bytes, but we want halfs (or 2bytes).
+            codeSize += (macroParams+1) / 2;
         return MakeMacroWithArguments(2 * (index + 1), *macroData);
+        }
+    }
+    else
+    {
+        const auto& macroData = formatCodeMacrosJpnOoT.find(code);
+        if (macroData != formatCodeMacrosJpnOoT.end())
+        {
+            size_t macroParams = macroData->second.second;
+            // Params amount is in bytes, but we want halfs (or 2bytes).
+            codeSize += (macroParams+1) / 2;
+            return MakeMacroWithArguments(2 * (index + 1), *macroData);
+        }
     }
 
     codeSize = 0;
@@ -399,12 +434,25 @@ std::string ZMessage::GetCnMacro(size_t index, size_t& codeSize)
     }
 
     // Codes
-    const auto& macroData = formatCodeMacrosAsciiOoT.find(code);
-    if (macroData != formatCodeMacrosAsciiOoT.end())
+    if (Globals::Instance->game == ZGame::MM_RETAIL)
     {
-        size_t macroParams = macroData->second.second;
-        codeSize += macroParams;
-        return MakeMacroWithArguments(index+1, *macroData);
+        const auto& macroData = formatCodeMacrosAsciiMM.find(code);
+        if (macroData != formatCodeMacrosAsciiMM.end())
+        {
+            size_t macroParams = macroData->second.second;
+            codeSize += macroParams;
+            return MakeMacroWithArguments(index+1, *macroData);
+        }
+    }
+    else
+    {
+        const auto& macroData = formatCodeMacrosAsciiOoT.find(code);
+        if (macroData != formatCodeMacrosAsciiOoT.end())
+        {
+            size_t macroParams = macroData->second.second;
+            codeSize += macroParams;
+            return MakeMacroWithArguments(index+1, *macroData);
+        }
     }
 
     codeSize = 0;
@@ -450,17 +498,29 @@ size_t ZMessage::GetMacroArgumentsPadding(uint16_t code, ZMessageEncoding encodi
 {
     if (encoding == ZMessageEncoding::Jpn)
     {
-        switch (code)
+        if (Globals::Instance->game == ZGame::MM_RETAIL)
         {
-        case 0x000B:
-        case 0x86C7:
-        case 0x81A3:
-        case 0x819E:
-        case 0x819A:
-        case 0x86B3:
-        case 0x86C9:
-        case 0x869F:
-            return 1;
+            switch (code)
+            {
+            case 0x001F: // MSGCODE_INDENT
+                return 1;
+            }
+
+        }
+        else
+        {
+            switch (code)
+            {
+            case 0x000B:
+            case 0x86C7:
+            case 0x81A3:
+            case 0x819E:
+            case 0x819A:
+            case 0x86B3:
+            case 0x86C9:
+            case 0x869F:
+                return 1;
+            }
         }
     }
     return 0;
@@ -479,6 +539,15 @@ int ZMessage::GetBytesPerCode(uint16_t code, ZMessageEncoding encoding)
         }
         // Case fall-through is inteded.
     case ZMessageEncoding::Ascii:
+        if (Globals::Instance->game == ZGame::MM_RETAIL)
+        {
+            const auto& macroData = formatCodeMacrosAsciiMM.find(code);
+            if (macroData != formatCodeMacrosAsciiMM.end())
+            {
+                macroParams += macroData->second.second;
+            }
+        }
+        else
         {
             const auto& macroData = formatCodeMacrosAsciiOoT.find(code);
             if (macroData != formatCodeMacrosAsciiOoT.end())
@@ -489,6 +558,15 @@ int ZMessage::GetBytesPerCode(uint16_t code, ZMessageEncoding encoding)
         return 1 + macroParams;
 
     case ZMessageEncoding::Jpn:
+        if (Globals::Instance->game == ZGame::MM_RETAIL)
+        {
+            const auto& macroData = formatCodeMacrosJpnMM.find(code);
+            if (macroData != formatCodeMacrosJpnMM.end())
+            {
+                macroParams += macroData->second.second;
+            }
+        }
+        else
         {
             const auto& macroData = formatCodeMacrosJpnOoT.find(code);
             if (macroData != formatCodeMacrosJpnOoT.end())
@@ -580,6 +658,10 @@ bool ZMessage::IsCodeEndMarker(uint16_t code, ZMessageEncoding encoding)
 
 bool ZMessage::IsCodeTextColor(uint16_t code, ZMessageEncoding encoding)
 {
+    if (Globals::Instance->game == ZGame::MM_RETAIL)
+    {
+        return false;
+    }
     switch (encoding)
     {
     case ZMessageEncoding::Ascii:
