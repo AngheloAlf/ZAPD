@@ -138,7 +138,7 @@ void ZMessage::DeclareVar(const std::string& prefix, const std::string& bodyStr)
     {
         auxName = GetDefaultName(prefix, rawDataIndex);
     }
-    parent->AddDeclarationArray(rawDataIndex, DeclarationAlignment::None, GetRawDataSize(),
+    parent->AddDeclarationArray(rawDataIndex, DeclarationAlignment::Align4, GetRawDataSize(),
                             GetSourceTypeName(), auxName, GetRawDataSize(), bodyStr);
 }
 
