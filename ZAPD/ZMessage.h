@@ -192,13 +192,22 @@ public:
 		{ 0x07, { "MSGCODE_COLOR_SILVER", 0 } },
 		{ 0x08, { "MSGCODE_COLOR_ORANGE", 0 } },
 
+		{ 0x0A, { "MSGCODE_SLOWDOWNTEXT", 0 } }, // Slows down text (not used)
+		{ 0x0B, { "MSGCODE_PRINT_JUNGLECRUISEHITS", 0 } }, // Print: Hits Required to Win Jungle Cruise Reward
+		{ 0x0C, { "MSGCODE_PRINT_STRAYFAIRIES", 0 } }, // Print: Stray Fairies Collected in Current Dungeon
+		{ 0x0D, { "MSGCODE_PRINT_GOLD_SKULLTULAS", 0 } }, // Print: Gold Skulltulas Collected in Current Spider House
+
 		{ 0x10, { "MSGCODE_BOXBREAK", 0 } }, // Used when four lines of text have been printed, but can technically be used anywhere.
 		{ 0x11, { "MSGCODE_LINEBREAK", 0 } },
 		{ 0x12, { "MSGCODE_LINE_FEED", 0 } }, // Used when three lines of text have been printed.
 		{ 0x13, { "MSGCODE_CARRIAGE_RETURN", 0 } }, // Reset Cursor Position to Start of Current Line.
 		{ 0x14, { "MSGCODE_INDENT", 1 } }, // Print: xx Spaces
+		{ 0x15, { "MSGCODE_TEXTSKIP_OFF", 0 } }, // Disable Text Skip I
+		{ 0x16, { "MSGCODE_PLAYERNAME", 0 } }, // Print: Player Name
 		{ 0x17, { "MSGCODE_INSTANT_ON", 0 } }, // Enable: Instantaneous Text
 		{ 0x18, { "MSGCODE_INSTANT_OFF", 0 } }, // Disable: Instantaneous Text
+		{ 0x19, { "MSGCODE_TEXTSKIP_OFF_SOUND", 0 } }, // Disable Text Skip II
+		{ 0x1A, { "MSGCODE_KEEPOPEN", 0 } }, // Disable Text Box Close. Used for shop item descriptions.
 
 		{ 0x1B, { "MSGCODE_DELAY_", 2 } }, // Delay for xxxx Before Printing Remaining Text
 		{ 0x1C, { "MSGCODE_KEPTTEXT", 2 } }, // Keep Text on Screen for xxxx Before Closing
@@ -220,13 +229,22 @@ public:
 		{ 0x2007, { "MSGCODE_COLOR_SILVER", 0 } },
 		{ 0x2008, { "MSGCODE_COLOR_ORANGE", 0 } },
 
+		//{ 0x????, { "MSGCODE_SLOWDOWNTEXT", 0 } }, // Slows down text (not used)
+		{ 0x0310, { "MSGCODE_PRINT_JUNGLECRUISEHITS", 0 } }, // Print: Hits Required to Win Jungle Cruise Reward
+		{ 0x021C, { "MSGCODE_PRINT_STRAYFAIRIES", 0 } }, // Print: Stray Fairies Collected in Current Dungeon
+		{ 0x021D, { "MSGCODE_PRINT_GOLD_SKULLTULAS", 0 } }, // Print: Gold Skulltulas Collected in Current Spider House
+
 		{ 0x0009, { "MSGCODE_BOXBREAK", 0 } }, // Used when four lines of text have been printed, but can technically be used anywhere.
 		{ 0x000A, { "MSGCODE_LINEBREAK", 0 } },
 		{ 0x000B, { "MSGCODE_LINE_FEED", 0 } }, // Used when three lines of text have been printed.
 		{ 0x000C, { "MSGCODE_CARRIAGE_RETURN", 0 } }, // Reset Cursor Position to Start of Current Line.
 		{ 0x001F, { "MSGCODE_INDENT", 1 } }, // Print: xx Spaces
+		{ 0x0240, { "MSGCODE_TEXTSKIP_OFF", 0 } }, // Disable Text Skip I
+		{ 0x0100, { "MSGCODE_PLAYERNAME", 0 } }, // Print: Player Name
 		{ 0x0101, { "MSGCODE_INSTANT_ON", 0 } }, // Enable: Instantaneous Text
 		{ 0x0102, { "MSGCODE_INSTANT_OFF", 0 } }, // Disable: Instantaneous Text
+		{ 0x0103, { "MSGCODE_TEXTSKIP_OFF_SOUND", 0 } }, // Disable Text Skip II
+		{ 0x0104, { "MSGCODE_KEEPOPEN", 0 } }, // Disable Text Box Close. Used for shop item descriptions.
 
 		{ 0x0110, { "MSGCODE_DELAY_", 2 } }, // Delay for xxxx Before Printing Remaining Text
 		{ 0x0111, { "MSGCODE_KEPTTEXT", 2 } }, // Keep Text on Screen for xxxx Before Closing
