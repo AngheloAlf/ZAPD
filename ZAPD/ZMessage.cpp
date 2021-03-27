@@ -483,6 +483,10 @@ std::string ZMessage::MakeMacroWithArguments(size_t u8Index, const std::pair<uin
         {
             result += MessagesOoT::colorMacrosOoT.at(u8Chars.at(u8Index + i) & 0x07);
         }
+        else if (IsCodeHighScore(code, encoding))
+        {
+            result += MessagesOoT::highScoreMacrosOoT.at(u8Chars.at(u8Index + i));
+        }
         else
         {
             result += StringHelper::Sprintf("\"\\x%02X\"", u8Chars.at(u8Index + i));
@@ -677,6 +681,34 @@ bool ZMessage::IsCodeTextColor(uint16_t code, ZMessageEncoding encoding)
         }*/
         // OoT
         return code == 0x000B;
+    default:
+        return false;
+    }
+}
+
+bool ZMessage::IsCodeHighScore(uint16_t code, ZMessageEncoding encoding)
+{
+    if (Globals::Instance->game == ZGame::MM_RETAIL)
+    {
+        return false;
+    }
+    switch (encoding)
+    {
+    case ZMessageEncoding::Ascii:
+    case ZMessageEncoding::Cn:
+        /*if (Globals::Instance->game == ZGame::MM_RETAIL)
+        {
+            return code == ;
+        }*/
+        // OoT // TODO: check if this works for SW97
+        return code == 0x1E;
+    case ZMessageEncoding::Jpn:
+        /*if (Globals::Instance->game == ZGame::MM_RETAIL)
+        {
+            return code == ;
+        }*/
+        // OoT
+        return code == 0x869F;
     default:
         return false;
     }

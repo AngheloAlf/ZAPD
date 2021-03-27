@@ -73,6 +73,7 @@ public:
 	static bool IsCodeLineBreak(uint16_t code, ZMessageEncoding encoding);
 	static bool IsCodeEndMarker(uint16_t code, ZMessageEncoding encoding);
 	static bool IsCodeTextColor(uint16_t code, ZMessageEncoding encoding);
+	static bool IsCodeHighScore(uint16_t code, ZMessageEncoding encoding);
 };
 
 
@@ -189,13 +190,13 @@ namespace MessagesOoT
 
 	const std::map<uint16_t, const char*> highScoreMacrosOoT = {
 		// { code, "macro name" },
-		{ 0, "MSG_HIGHSCORE_HORSEBACK_ARCHERY" },
-		{ 1, "MSG_HIGHSCORE_POE_POINTS" },
-		{ 2, "MSG_HIGHSCORE_LARGEST_FISH" },
-		{ 3, "MSG_HIGHSCORE_HORSE_RACE_TIME" },
-		{ 4, "MSG_HIGHSCORE_MARATHON_TIME" },
-		// { 5, "MSG_HIGHSCORE_" },
-		{ 6, "MSG_HIGHSCORE_DAMPE_RACE_TIME" },
+		{ 0, "HORSEBACK_ARCHERY" },
+		{ 1, "POE_POINTS" },
+		{ 2, "LARGEST_FISH" },
+		{ 3, "HORSE_RACE_TIME" },
+		{ 4, "MARATHON_TIME" },
+		// { 5, "_" },
+		{ 6, "DAMPE_RACE_TIME" },
 	};
 };
 
