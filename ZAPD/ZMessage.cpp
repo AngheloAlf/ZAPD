@@ -324,15 +324,15 @@ std::string ZMessage::GetAsciiMacro(size_t index, size_t& codeSize)
     if (Globals::Instance->game == ZGame::MM_RETAIL)
     {
         // Special characters
-        const auto& specialChar = specialCharactersAsciiMM.find(code);
-        if (specialChar != specialCharactersAsciiMM.end())
+        const auto& specialChar = MessagesMM::specialCharactersAsciiMM.find(code);
+        if (specialChar != MessagesMM::specialCharactersAsciiMM.end())
         {
             return specialChar->second;
         }
 
         // Codes
-        const auto& macroData = formatCodeMacrosAsciiMM.find(code);
-        if (macroData != formatCodeMacrosAsciiMM.end())
+        const auto& macroData = MessagesMM::formatCodeMacrosAsciiMM.find(code);
+        if (macroData != MessagesMM::formatCodeMacrosAsciiMM.end())
         {
             size_t macroParams = macroData->second.second;
             codeSize += macroParams;
@@ -342,15 +342,15 @@ std::string ZMessage::GetAsciiMacro(size_t index, size_t& codeSize)
     else
     {
         // Special characters
-        const auto& specialChar = specialCharactersOoT.find(code);
-        if (specialChar != specialCharactersOoT.end())
+        const auto& specialChar = MessagesOoT::specialCharactersOoT.find(code);
+        if (specialChar != MessagesOoT::specialCharactersOoT.end())
         {
             return specialChar->second;
         }
 
         // Codes
-        const auto& macroData = formatCodeMacrosAsciiOoT.find(code);
-        if (macroData != formatCodeMacrosAsciiOoT.end())
+        const auto& macroData = MessagesOoT::formatCodeMacrosAsciiOoT.find(code);
+        if (macroData != MessagesOoT::formatCodeMacrosAsciiOoT.end())
         {
             size_t macroParams = macroData->second.second;
             codeSize += macroParams;
@@ -373,8 +373,8 @@ std::string ZMessage::GetJpnMacro(size_t index, size_t& codeSize)
     // Special characters
     if (upperHalf == 0x83)
     {
-        const auto& specialChar = specialCharactersOoT.find(SHORT_LOWERHALF(code));
-        if (specialChar != specialCharactersOoT.end())
+        const auto& specialChar = MessagesOoT::specialCharactersOoT.find(SHORT_LOWERHALF(code));
+        if (specialChar != MessagesOoT::specialCharactersOoT.end())
         {
             return specialChar->second;
         }
@@ -383,8 +383,8 @@ std::string ZMessage::GetJpnMacro(size_t index, size_t& codeSize)
     // Codes
     if (Globals::Instance->game == ZGame::MM_RETAIL)
     {
-        const auto& macroData = formatCodeMacrosJpnMM.find(code);
-        if (macroData != formatCodeMacrosJpnMM.end())
+        const auto& macroData = MessagesMM::formatCodeMacrosJpnMM.find(code);
+        if (macroData != MessagesMM::formatCodeMacrosJpnMM.end())
         {
             size_t macroParams = macroData->second.second;
             // Params amount is in bytes, but we want halfs (or 2bytes).
@@ -394,8 +394,8 @@ std::string ZMessage::GetJpnMacro(size_t index, size_t& codeSize)
     }
     else
     {
-        const auto& macroData = formatCodeMacrosJpnOoT.find(code);
-        if (macroData != formatCodeMacrosJpnOoT.end())
+        const auto& macroData = MessagesOoT::formatCodeMacrosJpnOoT.find(code);
+        if (macroData != MessagesOoT::formatCodeMacrosJpnOoT.end())
         {
             size_t macroParams = macroData->second.second;
             // Params amount is in bytes, but we want halfs (or 2bytes).
@@ -423,8 +423,8 @@ std::string ZMessage::GetCnMacro(size_t index, size_t& codeSize)
      **/
     if (code == 0xAA)
     {
-        const auto& specialChar = specialCharactersOoT.find(u8Chars.at(index+1));
-        if (specialChar != specialCharactersOoT.end())
+        const auto& specialChar = MessagesOoT::specialCharactersOoT.find(u8Chars.at(index+1));
+        if (specialChar != MessagesOoT::specialCharactersOoT.end())
         {
             codeSize = 2;
             return specialChar->second;
@@ -434,8 +434,8 @@ std::string ZMessage::GetCnMacro(size_t index, size_t& codeSize)
     // Codes
     if (Globals::Instance->game == ZGame::MM_RETAIL)
     {
-        const auto& macroData = formatCodeMacrosAsciiMM.find(code);
-        if (macroData != formatCodeMacrosAsciiMM.end())
+        const auto& macroData = MessagesMM::formatCodeMacrosAsciiMM.find(code);
+        if (macroData != MessagesMM::formatCodeMacrosAsciiMM.end())
         {
             size_t macroParams = macroData->second.second;
             codeSize += macroParams;
@@ -444,8 +444,8 @@ std::string ZMessage::GetCnMacro(size_t index, size_t& codeSize)
     }
     else
     {
-        const auto& macroData = formatCodeMacrosAsciiOoT.find(code);
-        if (macroData != formatCodeMacrosAsciiOoT.end())
+        const auto& macroData = MessagesOoT::formatCodeMacrosAsciiOoT.find(code);
+        if (macroData != MessagesOoT::formatCodeMacrosAsciiOoT.end())
         {
             size_t macroParams = macroData->second.second;
             codeSize += macroParams;
@@ -481,7 +481,7 @@ std::string ZMessage::MakeMacroWithArguments(size_t u8Index, const std::pair<uin
 
         if (IsCodeTextColor(code, encoding))
         {
-            result += colorMacrosOoT.at(u8Chars.at(u8Index + i) & 0x07);
+            result += MessagesOoT::colorMacrosOoT.at(u8Chars.at(u8Index + i) & 0x07);
         }
         else
         {
@@ -539,16 +539,16 @@ int ZMessage::GetBytesPerCode(uint16_t code, ZMessageEncoding encoding)
     case ZMessageEncoding::Ascii:
         if (Globals::Instance->game == ZGame::MM_RETAIL)
         {
-            const auto& macroData = formatCodeMacrosAsciiMM.find(code);
-            if (macroData != formatCodeMacrosAsciiMM.end())
+            const auto& macroData = MessagesMM::formatCodeMacrosAsciiMM.find(code);
+            if (macroData != MessagesMM::formatCodeMacrosAsciiMM.end())
             {
                 macroParams += macroData->second.second;
             }
         }
         else
         {
-            const auto& macroData = formatCodeMacrosAsciiOoT.find(code);
-            if (macroData != formatCodeMacrosAsciiOoT.end())
+            const auto& macroData = MessagesOoT::formatCodeMacrosAsciiOoT.find(code);
+            if (macroData != MessagesOoT::formatCodeMacrosAsciiOoT.end())
             {
                 macroParams += macroData->second.second;
             }
@@ -558,16 +558,16 @@ int ZMessage::GetBytesPerCode(uint16_t code, ZMessageEncoding encoding)
     case ZMessageEncoding::Jpn:
         if (Globals::Instance->game == ZGame::MM_RETAIL)
         {
-            const auto& macroData = formatCodeMacrosJpnMM.find(code);
-            if (macroData != formatCodeMacrosJpnMM.end())
+            const auto& macroData = MessagesMM::formatCodeMacrosJpnMM.find(code);
+            if (macroData != MessagesMM::formatCodeMacrosJpnMM.end())
             {
                 macroParams += macroData->second.second;
             }
         }
         else
         {
-            const auto& macroData = formatCodeMacrosJpnOoT.find(code);
-            if (macroData != formatCodeMacrosJpnOoT.end())
+            const auto& macroData = MessagesOoT::formatCodeMacrosJpnOoT.find(code);
+            if (macroData != MessagesOoT::formatCodeMacrosJpnOoT.end())
             {
                 macroParams += macroData->second.second;
             }

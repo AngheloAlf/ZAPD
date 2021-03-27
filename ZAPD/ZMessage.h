@@ -73,8 +73,12 @@ public:
 	static bool IsCodeLineBreak(uint16_t code, ZMessageEncoding encoding);
 	static bool IsCodeEndMarker(uint16_t code, ZMessageEncoding encoding);
 	static bool IsCodeTextColor(uint16_t code, ZMessageEncoding encoding);
+};
 
-	inline static const std::map<uint16_t, std::pair<const char*, size_t>> formatCodeMacrosAsciiOoT = {
+
+namespace MessagesOoT
+{
+	const std::map<uint16_t, std::pair<const char*, size_t>> formatCodeMacrosAsciiOoT = {
 		// { code, { "macro name", number of arguments (in bytes) } },
 		// { 0x00, { "MSGCODE_GARBAGE_1", 0 } },
 		{ 0x01, { "MSGCODE_LINEBREAK", 0 } },
@@ -110,7 +114,7 @@ public:
 		{ 0x1E, { "MSGCODE_HIGHSCORE", 1 } },
 		{ 0x1F, { "MSGCODE_TIME", 0 } },
 	};
-	inline static const std::map<uint16_t, std::pair<const char*, size_t>> formatCodeMacrosJpnOoT = {
+	const std::map<uint16_t, std::pair<const char*, size_t>> formatCodeMacrosJpnOoT = {
 		// { code, { "macro name", number of arguments (in bytes) } },
 		// { 0x????, { "MSGCODE_GARBAGE_1", 0 } },
 		{ 0x000A, { "MSGCODE_LINEBREAK", 0 } },
@@ -149,7 +153,7 @@ public:
 		{ 0x86D3, { "MSGCODE_JPN_UNK_SYMBOL", 0 } },
 	};
 
-	inline static const std::map<uint16_t, const char*> specialCharactersOoT = {
+	const std::map<uint16_t, const char*> specialCharactersOoT = {
 		// { code, "macro name" },
 		{ 0x96, "MSGCODE_E_ACUTE_LOWERCASE" }, // "é"
 
@@ -170,7 +174,8 @@ public:
 		{ 0xAA, "MSGCODE_STICK" },
 		{ 0xAB, "MSGCODE_DPAD" }, // Unused.
 	};
-	inline static const std::map<uint16_t, const char*> colorMacrosOoT = {
+
+	const std::map<uint16_t, const char*> colorMacrosOoT = {
 		// { code, "macro name" },
 		{ 0, "DEFAULT" },
 		{ 1, "RED" },
@@ -182,7 +187,22 @@ public:
 		{ 7, "WHITE" },
 	};
 
-	inline static const std::map<uint16_t, std::pair<const char*, size_t>> formatCodeMacrosAsciiMM = {
+	const std::map<uint16_t, const char*> highScoreMacrosOoT = {
+		// { code, "macro name" },
+		{ 0, "MSG_HIGHSCORE_HORSEBACK_ARCHERY" },
+		{ 1, "MSG_HIGHSCORE_POE_POINTS" },
+		{ 2, "MSG_HIGHSCORE_LARGEST_FISH" },
+		{ 3, "MSG_HIGHSCORE_HORSE_RACE_TIME" },
+		{ 4, "MSG_HIGHSCORE_MARATHON_TIME" },
+		// { 5, "MSG_HIGHSCORE_" },
+		{ 6, "MSG_HIGHSCORE_DAMPE_RACE_TIME" },
+	};
+};
+
+
+namespace MessagesMM
+{
+	const std::map<uint16_t, std::pair<const char*, size_t>> formatCodeMacrosAsciiMM = {
 		// { code, { "macro name", number of arguments (in bytes) } },
 		{ 0x00, { "MSGCODE_COLOR_DEFAULT", 0 } },
 		{ 0x01, { "MSGCODE_COLOR_RED", 0 } },
@@ -219,7 +239,7 @@ public:
 
 		{ 0xBF, { "MSGCODE_ENDMARKER", 0 } },
 	};
-	inline static const std::map<uint16_t, std::pair<const char*, size_t>> formatCodeMacrosJpnMM = {
+	const std::map<uint16_t, std::pair<const char*, size_t>> formatCodeMacrosJpnMM = {
 		// { code, { "macro name", number of arguments (in bytes) } },
 		{ 0x2000, { "MSGCODE_COLOR_DEFAULT", 0 } },
 		{ 0x2001, { "MSGCODE_COLOR_RED", 0 } },
@@ -257,7 +277,7 @@ public:
 		{ 0x0500, { "MSGCODE_ENDMARKER", 0 } },
 	};
 
-	inline static const std::map<uint16_t, const char*> specialCharactersAsciiMM = {
+	const std::map<uint16_t, const char*> specialCharactersAsciiMM = {
 		// { code, "macro name" },
 		{ 0x9D, "MSGCODE_E_ACUTE_LOWERCASE" }, // "é"
 
@@ -278,7 +298,7 @@ public:
 		{ 0xBB, "MSGCODE_STICK" },
 		// { 0x??, "MSGCODE_DPAD" }, // Unused.
 	};
-	inline static const std::map<uint16_t, const char*> specialCharactersJpnMM = {
+	const std::map<uint16_t, const char*> specialCharactersJpnMM = {
 		// { code, "macro name" },
 		{ 0x899F, "MSGCODE_A_BTN" },
 		{ 0x89A0, "MSGCODE_B_BTN" },
