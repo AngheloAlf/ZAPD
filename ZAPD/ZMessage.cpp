@@ -245,7 +245,7 @@ std::string ZMessage::GetCharacterAt(size_t index, size_t& codeSize)
 
         if (code == 0x00)
         {
-            result += "\\0";
+            result += "\\x00";
         }
         else if (code == '\"')
         {
@@ -278,7 +278,7 @@ std::string ZMessage::GetCharacterAt(size_t index, size_t& codeSize)
 
         if (code == 0x0000)
         {
-            result += "\\0\\0";
+            result += "\\x00\\x00";
         }
         /*else if (code == 0x835C)
         {

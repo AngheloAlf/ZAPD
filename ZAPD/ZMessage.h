@@ -98,7 +98,7 @@ namespace MessagesOoT
 		{ 0x0E, { "MSGCODE_DELAY_FADEOUT", 1 } },
 		{ 0x0F, { "MSGCODE_PLAYERNAME", 0 } },
 		{ 0x10, { "MSGCODE_BEGINOCARINA", 0 } },
-		{ 0x11, { "MSGCODE_UNUSED_2", 0 } }, // (Unused?) Fade out and wait; ignore following text. 
+		{ 0x11, { "MSGCODE_UNUSED_2", 2 } }, // (Unused?) Fade out and wait; ignore following text. 
 		// { 0x11, { "MSGCODE_UNUSED_2", 1 } },
 		{ 0x12, { "MSGCODE_PLAYSOUND", 2 } },
 		{ 0x13, { "MSGCODE_ITEMICON", 1 } },
