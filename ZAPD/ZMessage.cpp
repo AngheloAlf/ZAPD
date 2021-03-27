@@ -275,21 +275,23 @@ std::string ZMessage::GetCharacterAt(size_t index, size_t& codeSize)
     if (encoding == ZMessageEncoding::Jpn)
     {
         uint16_t code = u16Chars.at(index);
+        uint16_t upperHalf = SHORT_UPPERHALF(code);
+        uint16_t lowerHalf = SHORT_LOWERHALF(code);
 
         if (code == 0x0000)
         {
             result += "\\x00\\x00";
         }
-        /*else if (code == 0x835C)
+        else if (lowerHalf == 0x5C)
         {
-            // For some reason, the compiler will not omit the 0x53 part of this character.
-            // So now it is a special case
-            result += "\\x83\\x5C"; // ソ
-        }*/
+            // HACK: For some reason, the compiler will omit the 0x53 part of
+            // this character, so this a special case.
+            result += StringHelper::Sprintf("\\x%02X\\x%02X", upperHalf, lowerHalf);
+        }
         else
         {
-            result += SHORT_UPPERHALF(code);
-            result += SHORT_LOWERHALF(code);
+            result += upperHalf;
+            result += lowerHalf;
         }
 
         return result;
