@@ -145,6 +145,8 @@ public:
 		{ 0x86A4, { "MSGCODE_FISHSIZE", 0 } },
 		{ 0x869F, { "MSGCODE_HIGHSCORE", 1 } },
 		{ 0x81A1, { "MSGCODE_TIME", 0 } },
+
+		{ 0x86D3, { "MSGCODE_JPN_UNK_SYMBOL", 0 } },
 	};
 
 	inline static const std::map<uint16_t, const char*> specialCharactersOoT = {
