@@ -146,6 +146,8 @@ std::string ZMessage::GetBodySourceCode()
 {
 	std::string bodyStr = "    ";
     bool lastWasMacro = true;
+    bool isNewLine = true;
+    bool isIndented = false;
 
     size_t i = 0;
     while (i < GetMessageLength())
@@ -161,14 +163,41 @@ std::string ZMessage::GetBodySourceCode()
                 lastWasMacro = true;
             }
             bodyStr += macro + " ";
+            if (IsBreak(i))
+            {
+                if (!IsEndMarker(i))
+                {
+                    bodyStr += "\n    ";
+                }
+                isNewLine = true;
+                isIndented = false;
+            }
+            else
+            {
+                isNewLine = false;
+            }
+            if (IsIndent(i))
+            {
+                isIndented = true;
+            }
         }
         else
         {
             if (lastWasMacro)
             {
-                if (i != 0)
+                if (i != 0 && !isNewLine)
                 {
                     bodyStr += "\n    ";
+                    isNewLine = true;
+                }
+                else
+                {
+                    isNewLine = false;
+                }
+                if (isIndented)
+                {
+                    bodyStr += "    ";
+                    //isIndented = false;
                 }
 
                 bodyStr += "\"";
@@ -584,6 +613,11 @@ int ZMessage::GetBytesPerCode(uint16_t code, ZMessageEncoding encoding)
     return 0;
 }
 
+bool ZMessage::IsBreak(size_t index)
+{
+    return IsLineBreak(index) || IsEndMarker(index) || IsBoxBreak(index);
+}
+
 bool ZMessage::IsLineBreak(size_t index)
 {
     switch (encoding)
@@ -607,6 +641,34 @@ bool ZMessage::IsEndMarker(size_t index)
         return IsCodeEndMarker(u8Chars.at(index), encoding);
     case ZMessageEncoding::Jpn:
         return IsCodeEndMarker(u16Chars.at(index), encoding);
+    default:
+        return false;
+    }
+}
+
+bool ZMessage::IsBoxBreak(size_t index)
+{
+    switch (encoding)
+    {
+    case ZMessageEncoding::Ascii:
+    case ZMessageEncoding::Cn:
+        return IsCodeBoxBreak(u8Chars.at(index), encoding);
+    case ZMessageEncoding::Jpn:
+        return IsCodeBoxBreak(u16Chars.at(index), encoding);
+    default:
+        return false;
+    }
+}
+
+bool ZMessage::IsIndent(size_t index)
+{
+    switch (encoding)
+    {
+    case ZMessageEncoding::Ascii:
+    case ZMessageEncoding::Cn:
+        return IsCodeIndent(u8Chars.at(index), encoding);
+    case ZMessageEncoding::Jpn:
+        return IsCodeIndent(u16Chars.at(index), encoding);
     default:
         return false;
     }
@@ -655,6 +717,54 @@ bool ZMessage::IsCodeEndMarker(uint16_t code, ZMessageEncoding encoding)
         }
         // OoT
         return code == 0x8170;
+    default:
+        return false;
+    }
+}
+
+bool ZMessage::IsCodeBoxBreak(uint16_t code, ZMessageEncoding encoding)
+{
+    switch (encoding)
+    {
+    case ZMessageEncoding::Ascii:
+    case ZMessageEncoding::Cn:
+        if (Globals::Instance->game == ZGame::MM_RETAIL)
+        {
+            return code == 0x10;
+        }
+        // OoT // TODO: check if this works for SW97
+        return code == 0x04;
+    case ZMessageEncoding::Jpn:
+        if (Globals::Instance->game == ZGame::MM_RETAIL)
+        {
+            return code == 0x0009;
+        }
+        // OoT
+        return code == 0x81A5;
+    default:
+        return false;
+    }
+}
+
+bool ZMessage::IsCodeIndent(uint16_t code, ZMessageEncoding encoding)
+{
+    switch (encoding)
+    {
+    case ZMessageEncoding::Ascii:
+    case ZMessageEncoding::Cn:
+        if (Globals::Instance->game == ZGame::MM_RETAIL)
+        {
+            return code == 0x14;
+        }
+        // OoT // TODO: check if this works for SW97
+        return code == 0x06;
+    case ZMessageEncoding::Jpn:
+        if (Globals::Instance->game == ZGame::MM_RETAIL)
+        {
+            return code == 0x001F;
+        }
+        // OoT
+        return code == 0x86C7;
     default:
         return false;
     }

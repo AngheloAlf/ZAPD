@@ -36,8 +36,13 @@ protected:
 
 	std::string MakeMacroWithArguments(size_t u8Index, const std::pair<uint16_t, std::pair<const char*, size_t>>& macroData);
 
+	bool IsBreak(size_t index);
+
 	bool IsLineBreak(size_t index);
 	bool IsEndMarker(size_t index);
+	bool IsBoxBreak(size_t index);
+
+	bool IsIndent(size_t index);
 
 public:
 	ZMessage() = default;
@@ -72,6 +77,8 @@ public:
 
 	static bool IsCodeLineBreak(uint16_t code, ZMessageEncoding encoding);
 	static bool IsCodeEndMarker(uint16_t code, ZMessageEncoding encoding);
+	static bool IsCodeBoxBreak(uint16_t code, ZMessageEncoding encoding);
+	static bool IsCodeIndent(uint16_t code, ZMessageEncoding encoding);
 	static bool IsCodeTextColor(uint16_t code, ZMessageEncoding encoding);
 	static bool IsCodeHighScore(uint16_t code, ZMessageEncoding encoding);
 };
