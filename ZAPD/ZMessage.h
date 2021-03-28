@@ -163,7 +163,39 @@ namespace MessagesOoT
 
 	const std::map<uint16_t, const char*> specialCharactersOoT = {
 		// { code, "macro name" },
+		{ 0x7F, "MSGCODE_OVERLINE" }, // "‾"
+		{ 0x80, "MSGCODE_A_GRAVE_UPPERCASE" }, // "À"
+		{ 0x81, "MSGCODE_I_CIRCUMFLEX_LOWERCASE" }, // "î"
+		{ 0x82, "MSGCODE_A_CIRCUMFLEX_UPPERCASE" }, // "Â"
+		{ 0x83, "MSGCODE_A_DIAERESIS_UPPERCASE" }, // "Ä"
+		{ 0x84, "MSGCODE_C_CEDILLA_UPPERCASE" }, // "Ç"
+		{ 0x85, "MSGCODE_E_GRAVE_UPPERCASE" }, // "È"
+		{ 0x86, "MSGCODE_E_ACUTE_UPPERCASE" }, // "É"
+		{ 0x87, "MSGCODE_E_CIRCUMFLEX_UPPERCASE" }, // "Ê"
+		{ 0x88, "MSGCODE_E_DIAERESIS_UPPERCASE" }, // "Ë"
+		{ 0x89, "MSGCODE_I_DIAERESIS_UPPERCASE" }, // "Ï"
+		{ 0x8A, "MSGCODE_O_CIRCUMFLEX_UPPERCASE" }, // "Ô"
+		{ 0x8B, "MSGCODE_O_DIAERESIS_UPPERCASE" }, // "Ö"
+		{ 0x8C, "MSGCODE_U_GRAVE_UPPERCASE" }, // "Ù"
+		{ 0x8D, "MSGCODE_U_CIRCUMFLEX_UPPERCASE" }, // "Û"
+		{ 0x8E, "MSGCODE_U_DIAERESIS_UPPERCASE" }, // "Ü" 
+
+		{ 0x8F, "MSGCODE_B_ESZETT" }, // "ß" 
+		{ 0x90, "MSGCODE_A_GRAVE_LOWERCASE" }, // "à" 
+		{ 0x91, "MSGCODE_A_ACUTE_LOWERCASE" }, // "á" 
+		{ 0x92, "MSGCODE_A_CIRCUMFLEX_LOWERCASE" }, // "â" 
+		{ 0x93, "MSGCODE_A_DIAERESIS_LOWERCASE" }, // "ä" 
+		{ 0x94, "MSGCODE_C_CEDILLA_LOWERCASE" }, // "ç"
+		{ 0x95, "MSGCODE_E_GRAVE_LOWERCASE" }, // "è"
 		{ 0x96, "MSGCODE_E_ACUTE_LOWERCASE" }, // "é"
+		{ 0x97, "MSGCODE_E_CIRCUMFLEX_LOWERCASE" }, // "ê"
+		{ 0x98, "MSGCODE_E_DIAERESIS_LOWERCASE" }, // "ë"
+		{ 0x99, "MSGCODE_I_DIAERESIS_LOWERCASE" }, // "ï"
+		{ 0x9A, "MSGCODE_O_CIRCUMFLEX_LOWERCASE" }, // "ô"
+		{ 0x9B, "MSGCODE_O_DIAERESIS_LOWERCASE" }, // "ö" 
+		{ 0x9C, "MSGCODE_U_GRAVE_LOWERCASE" }, // "ù" 
+		{ 0x9D, "MSGCODE_U_CIRCUMFLEX_LOWERCASE" }, // "û" 
+		{ 0x9E, "MSGCODE_U_DIAERESIS_LOWERCASE" }, // "ü" 
 
 		{ 0x9F, "MSGCODE_A_BTN" },
 		{ 0xA0, "MSGCODE_B_BTN" },
