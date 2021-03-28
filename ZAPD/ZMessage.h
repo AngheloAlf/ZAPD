@@ -163,6 +163,7 @@ namespace MessagesOoT
 
 	const std::map<uint16_t, const char*> specialCharactersOoT = {
 		// { code, "macro name" },
+		/*
 		{ 0x7F, "MSGCODE_OVERLINE" }, // "‾"
 		{ 0x80, "MSGCODE_A_GRAVE_UPPERCASE" }, // "À"
 		{ 0x81, "MSGCODE_I_CIRCUMFLEX_LOWERCASE" }, // "î"
@@ -196,6 +197,41 @@ namespace MessagesOoT
 		{ 0x9C, "MSGCODE_U_GRAVE_LOWERCASE" }, // "ù" 
 		{ 0x9D, "MSGCODE_U_CIRCUMFLEX_LOWERCASE" }, // "û" 
 		{ 0x9E, "MSGCODE_U_DIAERESIS_LOWERCASE" }, // "ü" 
+		*/
+
+		{ 0x7F, "MSGCODE_OVERLINE" }, // "‾"
+		{ 0x80, "À" }, // "À"
+		{ 0x81, "î" }, // "î"
+		{ 0x82, "Â" }, // "Â"
+		{ 0x83, "Ä" }, // "Ä"
+		{ 0x84, "Ç" }, // "Ç"
+		{ 0x85, "È" }, // "È"
+		{ 0x86, "É" }, // "É"
+		{ 0x87, "Ê" }, // "Ê"
+		{ 0x88, "Ë" }, // "Ë"
+		{ 0x89, "Ï" }, // "Ï"
+		{ 0x8A, "Ô" }, // "Ô"
+		{ 0x8B, "Ö" }, // "Ö"
+		{ 0x8C, "Ù" }, // "Ù"
+		{ 0x8D, "Û" }, // "Û"
+		{ 0x8E, "Ü" }, // "Ü" 
+
+		{ 0x8F, "ß" }, // "ß" 
+		{ 0x90, "à" }, // "à" 
+		{ 0x91, "á" }, // "á" 
+		{ 0x92, "â" }, // "â" 
+		{ 0x93, "ä" }, // "ä" 
+		{ 0x94, "ç" }, // "ç"
+		{ 0x95, "è" }, // "è"
+		{ 0x96, "é" }, // "é"
+		{ 0x97, "ê" }, // "ê"
+		{ 0x98, "ë" }, // "ë"
+		{ 0x99, "ï" }, // "ï"
+		{ 0x9A, "ô" }, // "ô"
+		{ 0x9B, "ö" }, // "ö" 
+		{ 0x9C, "ù" }, // "ù" 
+		{ 0x9D, "û" }, // "û" 
+		{ 0x9E, "ü" }, // "ü" 
 
 		{ 0x9F, "MSGCODE_A_BTN" },
 		{ 0xA0, "MSGCODE_B_BTN" },
