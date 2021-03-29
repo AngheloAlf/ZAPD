@@ -27,6 +27,8 @@ protected:
 	
 	size_t padding = 0;
 
+	void SetHeader();
+
 	std::string GetForeignCharacter(size_t index, size_t& codeSize);
 
 	// Convenience method. Calls GetAsciiMacro, GetJpnMacro or GetCnMacro.

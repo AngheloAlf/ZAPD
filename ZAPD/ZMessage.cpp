@@ -14,6 +14,8 @@ ZMessage::ZMessage(tinyxml2::XMLElement* reader, const std::vector<uint8_t>& nRa
 
 	ParseXML(reader);
 	ParseRawData();
+
+    SetHeader();
 }
 
 ZMessage::ZMessage(ZMessageEncoding nEncoding, const std::string& prefix,
@@ -27,6 +29,8 @@ ZMessage::ZMessage(ZMessageEncoding nEncoding, const std::string& prefix,
 	encoding = nEncoding;
 
 	ParseRawData();
+
+    SetHeader();
 }
 
 void ZMessage::ParseXML(tinyxml2::XMLElement* reader)
@@ -106,6 +110,32 @@ void ZMessage::ParseRawData()
     for (size_t j = 0; j <  u8Chars.size(); j+=2)
     {
         u16Chars.push_back(BitConverter::ToUInt16BE(u8Chars, j));
+    }
+}
+
+void ZMessage::SetHeader()
+{
+    if (Globals::Instance->game == ZGame::MM_RETAIL)
+    {
+        if (encoding == ZMessageEncoding::Jpn)
+        {
+            parent->SetAlternativeHeader("mm_jpn_msg_macros.h");
+        }
+        else
+        {
+            parent->SetAlternativeHeader("mm_nes_msg_macros.h");
+        }
+    }
+    else
+    {
+        if (encoding == ZMessageEncoding::Jpn)
+        {
+            parent->SetAlternativeHeader("jpn_msg_macros.h");
+        }
+        else
+        {
+            parent->SetAlternativeHeader("nes_msg_macros.h");
+        }
     }
 }
 

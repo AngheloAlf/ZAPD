@@ -71,6 +71,7 @@ public:
 	bool HasDeclaration(uint32_t address);
 	std::string GetHeaderInclude();
 	void GeneratePlaceholderDeclarations();
+	void SetAlternativeHeader(std::string newHeader);
 
 protected:
 	std::vector<uint8_t> rawData;
@@ -78,6 +79,7 @@ protected:
 	std::string basePath;
 	std::string outputPath;
 	std::string sourceOutput;
+	std::string alternativeHeader;
 
 	ZFile();
 	void ParseXML(ZFileMode mode, tinyxml2::XMLElement* reader, std::string filename,

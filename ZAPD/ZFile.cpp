@@ -824,8 +824,17 @@ void ZFile::GenerateHLIntermediette()
 
 std::string ZFile::GetHeaderInclude()
 {
-	return StringHelper::Sprintf("#include \"%s\"\n\n",
-	                             (Path::GetFileNameWithoutExtension(name) + ".h").c_str());
+	std::string header = Path::GetFileNameWithoutExtension(name) + ".h";
+	if (alternativeHeader != "")
+	{
+		header = alternativeHeader;
+	}
+	return StringHelper::Sprintf("#include \"%s\"\n\n", header.c_str());
+}
+
+void ZFile::SetAlternativeHeader(std::string newHeader)
+{
+	alternativeHeader = newHeader;
 }
 
 void ZFile::GeneratePlaceholderDeclarations()
