@@ -27,6 +27,8 @@ protected:
 	
 	size_t padding = 0;
 
+	std::string GetForeignCharacter(size_t index, size_t& codeSize);
+
 	// Convenience method. Calls GetAsciiMacro, GetJpnMacro or GetCnMacro.
 	std::string GetMacro(size_t index, size_t& codeSize);
 
@@ -199,6 +201,26 @@ namespace MessagesOoT
 		{ 0x9E, "MSGCODE_U_DIAERESIS_LOWERCASE" }, // "ü" 
 		*/
 
+		{ 0x9F, "MSGCODE_A_BTN" },
+		{ 0xA0, "MSGCODE_B_BTN" },
+		{ 0xA1, "MSGCODE_C_BTN" },
+
+		{ 0xA2, "MSGCODE_L_BTN" },
+		{ 0xA3, "MSGCODE_R_BTN" },
+		{ 0xA4, "MSGCODE_Z_BTN" },
+
+		{ 0xA5, "MSGCODE_CUP_BTN" },
+		{ 0xA6, "MSGCODE_CDOWN_BTN" },
+		{ 0xA7, "MSGCODE_CLEFT_BTN" },
+		{ 0xA8, "MSGCODE_CRIGHT_BTN" },
+
+		{ 0xA9, "MSGCODE_TARGET_ICON" },
+		{ 0xAA, "MSGCODE_STICK" },
+		{ 0xAB, "MSGCODE_DPAD" }, // Unused.
+	};
+
+	const std::map<uint16_t, const char*> foreignCharactersOoT = {
+		// { code, "macro name" },
 		{ 0x7F, "MSGCODE_OVERLINE" }, // "‾"
 		{ 0x80, "À" }, // "À"
 		{ 0x81, "î" }, // "î"
@@ -232,23 +254,6 @@ namespace MessagesOoT
 		{ 0x9C, "ù" }, // "ù" 
 		{ 0x9D, "û" }, // "û" 
 		{ 0x9E, "ü" }, // "ü" 
-
-		{ 0x9F, "MSGCODE_A_BTN" },
-		{ 0xA0, "MSGCODE_B_BTN" },
-		{ 0xA1, "MSGCODE_C_BTN" },
-
-		{ 0xA2, "MSGCODE_L_BTN" },
-		{ 0xA3, "MSGCODE_R_BTN" },
-		{ 0xA4, "MSGCODE_Z_BTN" },
-
-		{ 0xA5, "MSGCODE_CUP_BTN" },
-		{ 0xA6, "MSGCODE_CDOWN_BTN" },
-		{ 0xA7, "MSGCODE_CLEFT_BTN" },
-		{ 0xA8, "MSGCODE_CRIGHT_BTN" },
-
-		{ 0xA9, "MSGCODE_TARGET_ICON" },
-		{ 0xAA, "MSGCODE_STICK" },
-		{ 0xAB, "MSGCODE_DPAD" }, // Unused.
 	};
 
 	const std::map<uint16_t, const char*> colorMacrosOoT = {
@@ -355,7 +360,9 @@ namespace MessagesMM
 
 	const std::map<uint16_t, const char*> specialCharactersAsciiMM = {
 		// { code, "macro name" },
+		/*
 		{ 0x9D, "MSGCODE_E_ACUTE_LOWERCASE" }, // "é"
+		*/
 
 		{ 0xB0, "MSGCODE_A_BTN" },
 		{ 0xB1, "MSGCODE_B_BTN" },
@@ -389,5 +396,10 @@ namespace MessagesMM
 		{ 0x89A9, "MSGCODE_TARGET_ICON" },
 		{ 0x89AA, "MSGCODE_STICK" },
 		{ 0x89AB, "MSGCODE_DPAD" }, // Unused.
+	};
+
+	const std::map<uint16_t, const char*> foreignCharactersMM = {
+		// { code, "macro name" },
+		{ 0x9D, "é" }, // "é"
 	};
 };

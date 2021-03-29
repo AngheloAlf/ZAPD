@@ -148,6 +148,7 @@ std::string ZMessage::GetBodySourceCode()
     bool lastWasMacro = true;
     bool isNewLine = true;
     bool isIndented = false;
+    bool isQuotationOpen = false;
 
     size_t i = 0;
     while (i < GetMessageLength())
@@ -157,11 +158,12 @@ std::string ZMessage::GetBodySourceCode()
 
         if (codeSize != 0) // It's a macro
         {
-            if (!lastWasMacro)
+            if (isQuotationOpen)
             {
                 bodyStr += "\" ";
-                lastWasMacro = true;
+                isQuotationOpen = false;
             }
+            lastWasMacro = true;
             bodyStr += macro + " ";
             if (IsBreak(i))
             {
@@ -200,11 +202,23 @@ std::string ZMessage::GetBodySourceCode()
                     //isIndented = false;
                 }
 
-                bodyStr += "\"";
                 lastWasMacro = false;
             }
-            bodyStr += GetCharacterAt(i, codeSize);
-            assert(codeSize != 0);
+            if (!isQuotationOpen)
+            {
+                bodyStr += "\"";
+                isQuotationOpen = true;
+            }
+            std::string foreign = GetForeignCharacter(i, codeSize);
+            if (codeSize != 0)
+            {
+                bodyStr += foreign;
+            }
+            else
+            {
+                bodyStr += GetCharacterAt(i, codeSize);
+                assert(codeSize != 0);
+            }
         }
 
         i += codeSize;
@@ -328,6 +342,36 @@ std::string ZMessage::GetCharacterAt(size_t index, size_t& codeSize)
 
     codeSize = 0;
     return "ERROR";
+}
+
+std::string ZMessage::GetForeignCharacter(size_t index, size_t& codeSize)
+{
+    if (encoding == ZMessageEncoding::Ascii)
+    {
+        uint8_t code = u8Chars.at(index);
+
+        if (Globals::Instance->game == ZGame::MM_RETAIL)
+        {
+            const auto& foreignChar = MessagesMM::foreignCharactersMM.find(code);
+            if (foreignChar != MessagesMM::foreignCharactersMM.end())
+            {
+                codeSize = 1;
+                return foreignChar->second;
+            }
+        }
+        else
+        {
+            const auto& foreignChar = MessagesOoT::foreignCharactersOoT.find(code);
+            if (foreignChar != MessagesOoT::foreignCharactersOoT.end())
+            {
+                codeSize = 1;
+                return foreignChar->second;
+            }
+        }
+    }
+
+    codeSize = 0;
+    return "";
 }
 
 std::string ZMessage::GetMacro(size_t index, size_t& codeSize)
