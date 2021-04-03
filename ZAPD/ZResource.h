@@ -42,8 +42,8 @@ enum class ZResourceType
 	Vertex,
 	CollisionHeader,
 	Symbol,
-	Background,
 	Mtx,
+	Background,
 };
 
 class ZResource
