@@ -62,6 +62,12 @@ void ZBackground::ParseBinaryFile(const std::string& inFolder, bool appendOutNam
 		filepath = filepath / (outName + "." + GetExternalExtension());
 	}
 	data = File::ReadAllBytes(filepath);
+
+	// Add padding.
+	while (data.size() < GetRawDataSize())
+	{
+		data.push_back(0x00);
+	}
 }
 
 ZBackground* ZBackground::ExtractFromXML(tinyxml2::XMLElement* reader,
@@ -90,7 +96,8 @@ ZBackground* ZBackground::BuildFromXML(tinyxml2::XMLElement* reader, std::string
 
 int ZBackground::GetRawDataSize()
 {
-	return data.size();
+	// Jpgs seems to add padding until reaching this size.
+	return 0x25800;
 }
 
 void ZBackground::DeclareVar(const std::string& prefix, const std::string& bodyStr)
@@ -102,11 +109,6 @@ void ZBackground::DeclareVar(const std::string& prefix, const std::string& bodyS
 	}
 	parent->AddDeclarationArray(rawDataIndex, DeclarationAlignment::Align8, GetRawDataSize(),
 	                            GetSourceTypeName(), auxName, 0, bodyStr);
-	/*parent->AddDeclarationIncludeArray(rawDataIndex,
-	    StringHelper::Sprintf("%s/%s.%s.inc.c", outputDir.c_str(),
-	                            Path::GetFileNameWithoutExtension(GetOutName()).c_str(),
-	                            GetExternalExtension().c_str()),
-	    GetRawDataSize(), GetSourceTypeName(), GetName(), 0);*/
 }
 
 bool ZBackground::IsExternalResource()
@@ -130,11 +132,11 @@ std::string ZBackground::GetBodySourceCode()
 {
 	std::string bodyStr = "    ";
 
-	for (size_t i = 0; i < data.size(); ++i)
+	for (size_t i = 0; i < data.size()/8; ++i)
 	{
-		bodyStr += StringHelper::Sprintf("0x%02X, ", data.at(i));
+		bodyStr += StringHelper::Sprintf("0x%016llX, ", BitConverter::ToUInt64BE(data, i*8));
 
-		if (i % 16 == 15)
+		if (i % 8 == 7)
 		{
 			bodyStr += "\n    ";
 		}
@@ -169,7 +171,7 @@ std::string ZBackground::GetDefaultName(const std::string& prefix, uint32_t addr
 
 std::string ZBackground::GetSourceTypeName()
 {
-	return "u8";
+	return "u64";
 }
 
 ZResourceType ZBackground::GetResourceType()

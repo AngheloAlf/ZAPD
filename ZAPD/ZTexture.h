@@ -53,7 +53,6 @@ protected:
 	void PrepareRawDataPalette8(std::string palPath);
 	float GetPixelMultiplyer();
 	bool IsExternalResource() override;
-	ZResourceType GetResourceType() override;
 	void CalcHash() override;
 
 public:
@@ -86,4 +85,7 @@ public:
 	TextureType GetTextureType();
 	void Save(const std::string& outFolder) override;
 	std::string GetExternalExtension() override;
+
+	std::string GetSourceTypeName() override;
+	ZResourceType GetResourceType() override;
 };

@@ -746,11 +746,7 @@ void ZFile::GenerateSourceFiles(string outputDir)
 			while (StringHelper::EndsWith(outputDir, "/"))
 				outputDir = outputDir.substr(0, outputDir.length() - 1);
 
-			// HACK
-			string declType = "u64";
-
-			if (res->GetResourceType() != ZResourceType::Texture)
-				declType = "u8";
+			string declType = res->GetSourceTypeName();
 
 			AddDeclarationIncludeArray(
 				res->GetRawDataIndex(),
