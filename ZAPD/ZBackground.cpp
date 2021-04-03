@@ -6,7 +6,7 @@
 #include "ZFile.h"
 
 ZBackground::ZBackground(tinyxml2::XMLElement* reader, const std::vector<uint8_t>& nRawData,
-                       int nRawDataIndex, ZFile* nParent)
+                         int nRawDataIndex, ZFile* nParent)
 {
 	rawData.assign(nRawData.begin(), nRawData.end());
 	rawDataIndex = nRawDataIndex;
@@ -24,7 +24,7 @@ ZBackground::ZBackground(tinyxml2::XMLElement* reader, ZFile* nParent)
 }
 
 ZBackground::ZBackground(const std::string& prefix, const std::vector<uint8_t>& nRawData,
-                       int nRawDataIndex, ZFile* nParent)
+                         int nRawDataIndex, ZFile* nParent)
 {
 	rawData.assign(nRawData.begin(), nRawData.end());
 	rawDataIndex = nRawDataIndex;
@@ -65,8 +65,8 @@ void ZBackground::ParseBinaryFile(const std::string& inFolder, bool appendOutNam
 }
 
 ZBackground* ZBackground::ExtractFromXML(tinyxml2::XMLElement* reader,
-                                       const std::vector<uint8_t>& nRawData, int nRawDataIndex,
-                                       ZFile* nParent)
+                                         const std::vector<uint8_t>& nRawData, int nRawDataIndex,
+                                         ZFile* nParent)
 {
 	ZBackground* mtx = new ZBackground(reader, nRawData, nRawDataIndex, nParent);
 
@@ -76,7 +76,7 @@ ZBackground* ZBackground::ExtractFromXML(tinyxml2::XMLElement* reader,
 }
 
 ZBackground* ZBackground::BuildFromXML(tinyxml2::XMLElement* reader, std::string inFolder,
-                                     ZFile* nParent, bool readFile)
+                                       ZFile* nParent, bool readFile)
 {
 	ZBackground* back = new ZBackground(reader, nParent);
 
