@@ -31,6 +31,7 @@ public:
 	std::string baseRomPath, inputPath, outputPath, cfgPath;
 	TextureType texType;
 	ZGame game;
+	bool compactJpeg = false;
 
 	std::vector<ZFile*> files;
 	std::vector<int> segments;

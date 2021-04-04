@@ -203,6 +203,10 @@ int NewMain(int argc, char* argv[])
 			signal(SIGABRT, ErrorHandler);
 #endif
 		}
+		else if (arg == "--compactjpeg")  // Strip padding of jpgs while compiling.
+		{
+			Globals::Instance->compactJpeg = true;
+		}
 		else if (arg == "-v")  // Verbose
 		{
 			Globals::Instance->verbosity = (VerbosityLevel)strtol(argv[++i], NULL, 16);

@@ -1,6 +1,7 @@
 #include "ZBackground.h"
 #include "BitConverter.h"
 #include "File.h"
+#include "Globals.h"
 #include "Path.h"
 #include "StringHelper.h"
 #include "ZFile.h"
@@ -63,10 +64,13 @@ void ZBackground::ParseBinaryFile(const std::string& inFolder, bool appendOutNam
 	}
 	data = File::ReadAllBytes(filepath);
 
-	// Add padding.
-	while (data.size() < GetRawDataSize())
+	if (!Globals::Instance->compactJpeg)
 	{
-		data.push_back(0x00);
+		// Add padding.
+		while (data.size() < GetRawDataSize())
+		{
+			data.push_back(0x00);
+		}
 	}
 }
 
