@@ -460,6 +460,7 @@ void ZFile::ParseXML(ZFileMode mode, XMLElement* reader, std::string filename, b
 			}
 			resources.push_back(msgHeader);
 			rawDataIndex += msgHeader->GetRawDataSizeWithMessage();
+		}
 		else if (string(child->Name()) == "Mtx")
 		{
 			ZMtx* mtx = nullptr;
