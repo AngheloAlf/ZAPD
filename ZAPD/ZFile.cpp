@@ -15,6 +15,8 @@
 #include "ZLimb.h"
 #include "ZMessage.h"
 #include "ZMessageHeader.h"
+#include "ZMtx.h"
+#include "ZPrerender.h"
 #include "ZRoom/ZRoom.h"
 #include "ZScalar.h"
 #include "ZSkeleton.h"
@@ -156,6 +158,26 @@ void ZFile::ParseXML(ZFileMode mode, XMLElement* reader, std::string filename, b
 
 			resources.push_back(tex);
 			rawDataIndex += tex->GetRawDataSize();
+		}
+		else if (string(child->Name()) == "Prerender")
+		{
+			ZPrerender* back = nullptr;
+
+			if (mode == ZFileMode::Extract)
+			{
+				back = ZPrerender::ExtractFromXML(child, rawData, rawDataIndex, this);
+			}
+			else
+			{
+				back = ZPrerender::BuildFromXML(child, folderName, this, mode == ZFileMode::Build);
+			}
+
+			if (back == nullptr)
+			{
+				throw std::runtime_error("Couldn't create ZPrerender.");
+			}
+			resources.push_back(back);
+			rawDataIndex += back->GetRawDataSize();
 		}
 		else if (string(child->Name()) == "Blob")
 		{
@@ -438,6 +460,20 @@ void ZFile::ParseXML(ZFileMode mode, XMLElement* reader, std::string filename, b
 			}
 			resources.push_back(msgHeader);
 			rawDataIndex += msgHeader->GetRawDataSizeWithMessage();
+		else if (string(child->Name()) == "Mtx")
+		{
+			ZMtx* mtx = nullptr;
+
+			if (mode == ZFileMode::Extract)
+			{
+				mtx = ZMtx::ExtractFromXML(child, rawData, rawDataIndex, this);
+			}
+
+			if (mtx == nullptr)
+			{
+				throw std::runtime_error("Couldn't create ZMtx.");
+			}
+			resources.push_back(mtx);
 		}
 		else
 		{
