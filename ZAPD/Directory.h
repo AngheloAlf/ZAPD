@@ -36,4 +36,9 @@ public:
 
 		// fs::create_directory(path);
 	}
+
+	static size_t GetFileSize(const std::filesystem::path& filepath)
+	{
+		return fs::file_size(filepath);
+	}
 };

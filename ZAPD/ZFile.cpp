@@ -51,6 +51,8 @@ ZFile::ZFile(ZFileMode mode, tinyxml2::XMLElement* reader, const fs::path& nBase
 	: ZFile()
 {
 	xmlFilePath = nXmlFilePath;
+	rangeEnd = Directory::GetFileSize(nXmlFilePath);
+
 	if (nBasePath == "")
 		basePath = Directory::GetCurrentDirectory();
 	else
