@@ -51,7 +51,6 @@ ZFile::ZFile(ZFileMode mode, tinyxml2::XMLElement* reader, const fs::path& nBase
 	: ZFile()
 {
 	xmlFilePath = nXmlFilePath;
-	rangeEnd = Directory::GetFileSize(nXmlFilePath);
 
 	if (nBasePath == "")
 		basePath = Directory::GetCurrentDirectory();
@@ -127,8 +126,6 @@ void ZFile::ParseXML(ZFileMode mode, XMLElement* reader, std::string filename, b
 		Globals::Instance->AddSegment(segment, this);
 	}
 
-	std::string folderName = (basePath / Path::GetFileNameWithoutExtension(name)).string();
-
 	if (mode == ZFileMode::Extract)
 	{
 		if (!File::Exists((basePath / name).string()))
@@ -136,6 +133,7 @@ void ZFile::ParseXML(ZFileMode mode, XMLElement* reader, std::string filename, b
 				StringHelper::Sprintf("Error! File %s does not exist.", (basePath / name).c_str()));
 
 		rawData = File::ReadAllBytes((basePath / name).string());
+		rangeEnd = rawData.size();
 	}
 
 	std::unordered_set<std::string> nameSet;
