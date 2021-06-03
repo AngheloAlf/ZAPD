@@ -27,5 +27,6 @@ public:
 	ZResourceType GetResourceType() const override;
 
 protected:
-	std::array<std::array<int32_t, 4>, 4> mtx;
+	std::array<std::array<uint16_t, 4>, 4> intPart;
+	std::array<std::array<uint16_t, 4>, 4> fracPart;
 };

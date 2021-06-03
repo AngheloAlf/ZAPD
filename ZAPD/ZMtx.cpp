@@ -22,9 +22,23 @@ void ZMtx::ParseRawData()
 {
 	ZResource::ParseRawData();
 
+	uint32_t ptr = rawDataIndex;
 	for (size_t i = 0; i < 4; ++i)
+	{
 		for (size_t j = 0; j < 4; ++j)
-			mtx[i][j] = BitConverter::ToInt32BE(rawData, rawDataIndex + (i * 4 + j) * 4);
+		{
+			intPart[i][j] = BitConverter::ToUInt16BE(rawData, ptr);
+			ptr += 2;
+		}
+	}
+	for (size_t i = 0; i < 4; ++i)
+	{
+		for (size_t j = 0; j < 4; ++j)
+		{
+			fracPart[i][j] = BitConverter::ToUInt16BE(rawData, ptr);
+			ptr += 2;
+		}
+	}
 }
 
 void ZMtx::ExtractFromXML(tinyxml2::XMLElement* reader, const std::vector<uint8_t>& nRawData,
@@ -54,12 +68,21 @@ std::string ZMtx::GetBodySourceCode()
 {
 	std::string bodyStr = "\n";
 
-	for (const auto& row : mtx)
+	for (const auto& row : intPart)
 	{
-		bodyStr += "    ";
+		bodyStr += "\t";
 
 		for (int32_t val : row)
-			bodyStr += StringHelper::Sprintf("%-11i, ", val);
+			bodyStr += StringHelper::Sprintf("%6i, ", val);
+
+		bodyStr += "\n";
+	}
+	for (const auto& row : fracPart)
+	{
+		bodyStr += "\t";
+
+		for (int32_t val : row)
+			bodyStr += StringHelper::Sprintf("%6i, ", val);
 
 		bodyStr += "\n";
 	}
@@ -88,7 +111,7 @@ std::string ZMtx::GetDefaultName(const std::string& prefix, uint32_t address)
 
 std::string ZMtx::GetSourceTypeName() const
 {
-	return "Mtx";
+	return "MatrixInternal";
 }
 
 ZResourceType ZMtx::GetResourceType() const
