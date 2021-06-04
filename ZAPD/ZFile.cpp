@@ -1023,9 +1023,9 @@ std::string ZFile::ProcessDeclarations()
 			}
 
 			// Do not asm_process vertex arrays. They have no practical use being overridden.
-			// if (item.second->varType == "Vtx" || item.second->varType == "static Vtx")
-			if (item.second->varType != "u64" && item.second->varType != "static u64" &&
-			    item.second->varType != "u8" && item.second->varType != "static u8")
+			 if (item.second->varType == "Vtx" || item.second->varType == "static Vtx")
+			//if (item.second->varType != "u64" && item.second->varType != "static u64" &&
+			//    item.second->varType != "u8" && item.second->varType != "static u8")
 			{
 				output += StringHelper::Sprintf(
 					"%s %s[] = {\n    #include \"%s\"\n};\n\n", item.second->varType.c_str(),

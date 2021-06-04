@@ -754,16 +754,43 @@ std::string ZTexture::GetBodySourceCode() const
 {
 	std::string sourceOutput = "";
 
-	for (size_t i = 0; i < textureDataRaw.size(); i += 8)
+	for (size_t i = 0; i < textureDataRaw.size(); )
 	{
 		if (i % 32 == 0)
 			sourceOutput += "    ";
 
-		sourceOutput +=
-			StringHelper::Sprintf("0x%016llX, ", BitConverter::ToUInt64BE(textureDataRaw, i));
+		switch (format)
+		{
+		case TextureType::RGBA32bpp:
+			sourceOutput += StringHelper::Sprintf("0x%08X, ", BitConverter::ToUInt32BE(textureDataRaw, i));
+			i += 4;
+			break;
+
+		case TextureType::RGBA16bpp:
+		case TextureType::GrayscaleAlpha16bpp:
+			sourceOutput += StringHelper::Sprintf("0x%04X, ", BitConverter::ToUInt16BE(textureDataRaw, i));
+			i += 2;
+			break;
+
+		case TextureType::Grayscale4bpp:
+		case TextureType::Grayscale8bpp:
+		case TextureType::GrayscaleAlpha4bpp:
+		case TextureType::GrayscaleAlpha8bpp:
+		case TextureType::Palette4bpp:
+		case TextureType::Palette8bpp:
+			sourceOutput += StringHelper::Sprintf("0x%02X, ", BitConverter::ToUInt8BE(textureDataRaw, i));
+			i += 1;
+			break;
+
+		default:
+			throw std::runtime_error("Format is not supported!");
+		}
 
 		if (i % 32 == 24)
-			sourceOutput += StringHelper::Sprintf(" // 0x%06X \n", rawDataIndex + ((i / 32) * 32));
+		{
+			//sourceOutput += StringHelper::Sprintf(" // 0x%06X \n", rawDataIndex + ((i / 32) * 32));
+			sourceOutput += "\n";
+		}
 	}
 
 	// Ensure there's always a trailing line feed to prevent dumb warnings.
@@ -786,7 +813,26 @@ ZResourceType ZTexture::GetResourceType() const
 
 std::string ZTexture::GetSourceTypeName() const
 {
-	return "u64";
+	switch (format)
+	{
+	case TextureType::RGBA32bpp:
+		return "u32";
+
+	case TextureType::RGBA16bpp:
+	case TextureType::GrayscaleAlpha16bpp:
+		return "u16";
+
+	case TextureType::Grayscale4bpp:
+	case TextureType::Grayscale8bpp:
+	case TextureType::GrayscaleAlpha4bpp:
+	case TextureType::GrayscaleAlpha8bpp:
+	case TextureType::Palette4bpp:
+	case TextureType::Palette8bpp:
+		return "u8";
+
+	default:
+		return "ERROR";
+	}
 }
 
 void ZTexture::CalcHash()
